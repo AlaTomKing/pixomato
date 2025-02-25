@@ -4,4 +4,4 @@ Since I developed an artstyle (which I regret) of drawing pixelated cartoon char
 
 Piximator is a website where I can create pixelated animations (and maybe vector if you crank the resolution high).
 
-Piximator is slightly related to PixotatoJS
+Piximator is slightly related to PixotatoJS.
