@@ -28,8 +28,8 @@ button:hover:active {
     height: 32px;
 }
 
-#top-bar #title {
-    font-size: 12px;
+#top-bar > .title {
+    font-size: 13px;
 
     position: absolute;
 
@@ -41,7 +41,7 @@ button:hover:active {
     text-align: center;
 }
 
-#top-bar #bar-icon {
+#top-bar > .bar-icon {
     position: absolute;
     image-rendering: pixelated;
     left: 9px;
@@ -50,31 +50,36 @@ button:hover:active {
     height: 20px;
 }
 
-#top-bar #menu-container {
+#top-bar > .menu-container {
     position: absolute;
     display: flex;
-    height: 100%;
 
     right: 0px;
     left: 38px;
+
+    flex-direction: row;
+    align-items: center;
 
     top: 4px;
     bottom: 4px;
 }
 
-#top-bar #menu-container button {
+#top-bar > .menu-container > button {
     background-color: rgba(0,0,0,0);
+
     color: white;
     border: none;
-    font-size: 12px;
-    height: 24px;
+    font-size: 13px;
+    height: 32px;
     border-radius: 5px;
     padding-inline: 8px;
+
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 
-#top-bar #menu-container button:hover {
+#top-bar > .menu-container > button:hover {
     background-color: rgb(76, 81, 108);
-    border: none;
 }
 
 #bottom-bar {
@@ -96,4 +101,8 @@ button:hover:active {
 
 #play-button {
     position: absolute;
+}
+
+.title {
+
 }
