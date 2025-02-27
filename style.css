@@ -70,7 +70,9 @@ button:hover:active {
     color: white;
     border: none;
     font-size: 13px;
+    
     height: 22px;
+
     border-radius: 5px;
     padding-inline: 8px;
 
