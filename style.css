@@ -29,20 +29,52 @@ button:hover:active {
 }
 
 #top-bar #title {
-    font-size: 14px;
+    font-size: 12px;
 
     position: absolute;
 
-    top: 20%;
-    left: 44%;
+    height: 100%;
+    width: 100%;
 
+    vertical-align: middle;
+    line-height: 32px;
     text-align: center;
 }
 
+#top-bar #bar-icon {
+    position: absolute;
+    image-rendering: pixelated;
+    left: 9px;
+    top: 6px;
+    width: 20;
+    height: 20px;
+}
+
 #top-bar #menu-container {
+    position: absolute;
     display: flex;
     height: 100%;
-    width: 100%;
+
+    right: 0px;
+    left: 38px;
+
+    top: 4px;
+    bottom: 4px;
+}
+
+#top-bar #menu-container button {
+    background-color: rgba(0,0,0,0);
+    color: white;
+    border: none;
+    font-size: 12px;
+    height: 24px;
+    border-radius: 5px;
+    padding-inline: 8px;
+}
+
+#top-bar #menu-container button:hover {
+    background-color: rgb(76, 81, 108);
+    border: none;
 }
 
 #bottom-bar {
