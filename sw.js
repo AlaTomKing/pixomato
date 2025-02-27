@@ -8,7 +8,7 @@ let filesToCache = [
   "/style.css"
 ]
 
-self.addEventListener('install',function(e){
+self.addEventListener('install', function(e) {
   e.waitUntil(
       Promise.all([caches.open(STATIC_CACHE_NAME),caches.open(APP_CACHE_NAME),self.skipWaiting()]).then(function(storage){
           var static_cache = storage[0];
