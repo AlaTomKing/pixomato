@@ -1,0 +1,7 @@
+{
+    "name": "Pixomato",
+    "short_name": "Pixomato",
+    "lang": "en-US",
+    "start_url": "/index.html",
+    "display": "standalone"
+  }
