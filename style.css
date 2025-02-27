@@ -29,8 +29,6 @@ button:hover:active {
 }
 
 #top-bar #title {
-    display: flex;
-
     font-size: 14px;
 
     position: absolute;
@@ -39,6 +37,12 @@ button:hover:active {
     left: 44%;
 
     text-align: center;
+}
+
+#top-bar #menu-container {
+    display: flex;
+    height: 100%;
+    width: 100%;
 }
 
 #bottom-bar {
