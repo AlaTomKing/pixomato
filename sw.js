@@ -3,7 +3,9 @@
 
 const CACHE_NAME = "pixomato-offline";
 const STATIC_ASSETS = [
+    "/",
     "/index.html",
+    "/resources",
     "/resources/logo.png",
     "/resources/testBackground.png",
     "/index.js",

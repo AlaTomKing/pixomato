@@ -293,7 +293,7 @@
       render();
       resize();
 
-      if ("serviceWorker" in navigator && document.URL.split(":")[0] !== "file") {
+      if (navigator.serviceWorker) {
         navigator.serviceWorker.register("./sw.js");
       }
     }
