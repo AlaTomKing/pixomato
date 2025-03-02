@@ -1,106 +1,272 @@
 "use strict";
 
-document.querySelector("#menu-github-btn").addEventListener("click", () => {
-  window.open("https://github.com/AlaTomKing/pixomato")
-})
+(() => { 
+  const black = (text) => (`\x1b[30m${text}`)
+  const red = (text) => (`\x1b[31m${text}`)
+  const green = (text) => (`\x1b[32m${text}`)
+  const yellow = (text) => (`\x1b[33m${text}`)
+  const blue = (text) => (`\x1b[34m${text}`)
+  const magenta = (text) => (`\x1b[35m${text}`)
+  const cyan = (text) => (`\x1b[36m${text}`)
+  const white = (text) => (`\x1b[37m${text}`)
+  const bgBlack = (text) => (`\x1b[40m${text}\x1b[0m`)
+  const bgRed = (text) => (`\x1b[41m${text}\x1b[0m`)
+  const bgGreen = (text) => (`\x1b[42m${text}\x1b[0m`)
+  const bgYellow = (text) => (`\x1b[43m${text}\x1b[0m`)
+  const bgBlue = (text) => (`\x1b[44m${text}\x1b[0m`)
+  const bgMagenta = (text) => (`\x1b[45m${text}\x1b[)0m`)
+  const bgCyan = (text) => (`\x1b[46m${text}\x1b[0m`)
+  const bgWhite = (text) => (`\x1b[47m${text}\x1b[0m`)
 
-const canvasEl = document.getElementById("drawing-canvas")
-const ctx = canvasEl.getContext("2d")
+  document.querySelector("#menu-github-btn").addEventListener("click", () => {
+    window.open("https://github.com/AlaTomKing/pixomato");
+  })
 
-let mouseX, mouseY = 0;
+  const canvasEl = document.getElementById("drawing-canvas");
+  const ctx = canvasEl.getContext("2d");
 
-const rectSize = 10;
+  const rectSize = 10;
 
-let posX, posY = 0
-let zoom = 100; // 1: 100%
+  let cursorX, cursorY = 0;
 
-const res = window.devicePixelRatio;
+  let canvasSizeX = 640;
+  let canvasSizeY = 360;
 
-Number.prototype.clamp = function(min, max) {
-  return Math.min(Math.max(this, min), max);
-};
+  let displayWidth, displayHeight
 
-const render = () => {
-  const x = window.scrollX + window.innerWidth / 2;
-  const y = window.scrollY + window.innerHeight / 2;
+  let posX = -40; // 0 is center
+  let posY = -20; // 0 is center
 
-  ctx.clearRect(0, 0, canvasEl.width, canvasEl.height)
+  let zoom = 2; // 1: 100%
+  let zoom1 = 2;
+
+  let mouseMidX = 0;
+  let mouseMidY = 0;
+
+  let mouseInFrame = false;
+
+  let image = new Image()
+  image.src = "./resources/testBackground.png"
+
+  const res = window.devicePixelRatio;
+
+  // #region functions for canvas
+  const setHexFill = (hex) => {
+    ctx.fillStyle = hex;
+  }
+  const setRGBFill = (r, g, b, a = 1) => {
+    ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
+  }
+
+  const setHexStroke = (hex) => {
+    ctx.strokeStyle = hex;
+  }
+  const setRGBStroke = (r, g, b, a = 1) => {
+    ctx.strokeStyle = `rgba(${r},${g},${b},${a})`;
+  }
+
+  const fillRect = (x, y, w, h) => {
+    ctx.fillRect(x * res, y * res, w * res, h * res);
+  }
+
+  const insertImage = (x, y, w, h) => {
+    ctx.drawImage(image, 0, 0, 1924, 1082, x * res, y * res, w * res, h * res);
+  }
   
-  ctx.fillStyle = "rgb(255,255,255,0.3)"
-  ctx.fillRect(50*res, 60*res, 320*res, 180*res)
+  const setLineWidth = (width) => {
+    ctx.lineWidth = width;
+  }
 
-  ctx.fillStyle = "#f00"
-  ctx.fillRect((mouseX - rectSize / 2) * res, (mouseY - rectSize / 2) * res, rectSize * res, rectSize * res)
+  const dashedLine = (x0, y0, x1, y1) => {
+    ctx.beginPath();
+    ctx.setLineDash([10, 10]);
+    ctx.moveTo(x0*res, y0*res);
+    ctx.lineTo(x1*res, y1*res);
+    ctx.stroke();
+  }
 
-  console.log(x, y)
+  const line = (x0, y0, x1, y1) => {
+    ctx.beginPath();
+    ctx.setLineDash([]);
+    ctx.moveTo(x0*res, y0*res);
+    ctx.lineTo(x1*res, y1*res);
+    ctx.stroke();
+  }
 
-  //requestAnimationFrame(render)
-}
+  Number.prototype.clamp = function (min, max) {
+    return Math.min(Math.max(this, min), max);
+  };
 
-const resize = (e) => {
-  // if (ctx) {
-  //   ctx.scale((devicePixelRatio * res), (devicePixelRatio * res));
-  // }
+  const render = () => {
+    const x = window.scrollX + window.innerWidth / 2;
+    const y = window.scrollY + window.innerHeight / 2;
 
-  ctx.scale(res, res);
+    const midX = displayWidth / 2 - (posX);
+    const midY = displayHeight / 2 - (posY);
 
-  const displayWidth = window.innerWidth - canvasEl.offsetLeft
-  const displayHeight = window.innerHeight - canvasEl.offsetTop
+    ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
 
-  canvasEl.style.width = displayWidth + "px"
-  canvasEl.style.height = displayHeight + "px"
+    // MAIN FRAME
+    ctx.globalAlpha = 0.3
+    setRGBFill(255, 255, 255, 0.3);
+    insertImage((displayWidth / 2) - (canvasSizeX * zoom / 2) - posX, (displayHeight / 2) - (canvasSizeY * zoom / 2) - posY, canvasSizeX * zoom, canvasSizeY * zoom);
+    ctx.globalAlpha = 1
 
-  canvasEl.width = displayWidth * res
-  canvasEl.height = displayHeight * res
+    // MOUSE LINE
+    if (mouseInFrame) {
+      setLineWidth(10);
 
-  render()
-}
+      setHexStroke("#0000ff66");
+      line(0, cursorY, cursorX.clamp(0, midX), cursorY);
+      line(cursorX, 0, cursorX, cursorY.clamp(0, midY));
 
-const changeMousePos = (e) => {
-  // console.log(e)
-  // console.log("client:", e.clientX, e.clientY)
-  // console.log("screen:", e.screenX, e.screenY)
-  mouseX = e.clientX - canvasEl.offsetLeft
-  mouseY = e.clientY - canvasEl.offsetTop
+      setHexStroke("#ffffff66");
+      dashedLine(cursorX, cursorY, midX, cursorY);
+      dashedLine(cursorX, cursorY, cursorX, midY);
+    }
 
-  render()
-}
+    setLineWidth(5)
 
-const wheel = (e) => {
-  e.preventDefault()
-
-  zoom = Math.floor(zoom - e.deltaY).clamp(0, 10000)
-  console.log(zoom)
-
-  console.log("wheel")
-  console.log(e)
-
-  render()
-}
-
-const touch = (e) => {
-  e.preventDefault()
-
-  // console.log("touch")
-  // console.log(e)
-}
-
-//window.onresize(resize)
-
-document.addEventListener("resize", resize)
-document.addEventListener("mousemove", changeMousePos)
-document.addEventListener("wheel", wheel, { passive: false })
-document.addEventListener("touchmove", touch, { passive: false })
-
-console.log(window.devicePixelRatio)
-
-render()
-resize()
-
-// window.addEventListener("load", () => {
-//     "use strict";
+    setHexStroke("#ffff0066");
+    line(0, displayHeight/2, (displayWidth/2).clamp(0, midX), displayHeight/2)
+    line(displayWidth/2, 0, displayWidth/2, (displayHeight/2).clamp(0, midY))
     
-//     if ("serviceWorker" in navigator && document.URL.split(":")[0] !== "file") {
-//       navigator.serviceWorker.register("./sw.js");
-//     }
-// })
+    setHexStroke("#ffff0033");
+    dashedLine(displayWidth, displayHeight/2, (displayWidth/2).clamp(midX, displayWidth), displayHeight/2)
+    dashedLine(displayWidth/2, displayHeight, displayWidth/2, (displayHeight/2).clamp(midY, displayHeight))
+
+    setHexStroke("#ff000066");
+    line(0, midY, midX, midY)
+    line(midX, 0, midX, midY)
+
+    setHexStroke("#ff000033");
+    dashedLine(displayWidth, midY, midX, midY)
+    dashedLine(midX, displayHeight, midX, midY)
+
+    setHexStroke("#ff007f66");
+    line(midX, displayHeight/2, displayWidth/2, displayHeight/2)
+    line(displayWidth / 2, midY, displayWidth / 2, displayHeight / 2)
+
+    if (mouseInFrame) {
+      setHexFill("#0000ff66");
+      fillRect((cursorX - rectSize / 2), (cursorY - rectSize / 2), rectSize, rectSize);
+    }
+    //requestAnimationFrame(render)
+  }
+  
+  const logInfo = () => {
+    const midX = displayWidth / 2 - (posX);
+    const midY = displayHeight / 2 - (posY);
+
+    console.log("---------")
+    console.log(blue(`cursor: ${cursorX}, ${cursorY}`))
+    console.log(`cursorMid: ${cursorX - midX}, ${cursorY - midY}`)
+    console.log(red(`mid: ${midX}, ${midY}`))
+    console.log(yellow(`center: ${displayWidth / 2}, ${displayHeight / 2}`))
+    console.log(magenta(`pos: ${posX}, ${posY}`))
+  }
+
+  const resize = (e) => {
+    // if (ctx) {
+    //   ctx.scale((devicePixelRatio * res), (devicePixelRatio * res));
+    // }
+
+    ctx.scale(res, res);
+
+    displayWidth = window.innerWidth - canvasEl.offsetLeft;
+    displayHeight = window.innerHeight - canvasEl.offsetTop;
+
+    canvasEl.style.width = displayWidth + "px";
+    canvasEl.style.height = displayHeight + "px";
+
+    canvasEl.width = displayWidth * res;
+    canvasEl.height = displayHeight * res;
+
+    render();
+  }
+
+  const changeMousePos = (e) => {
+    // console.log(e)
+    // console.log("client:", e.clientX, e.clientY)
+    // console.log("screen:", e.screenX, e.screenY)
+    cursorX = e.clientX - canvasEl.offsetLeft;
+    cursorY = e.clientY - canvasEl.offsetTop;
+
+    mouseMidX = cursorX - displayWidth / 2 - (posX);
+    mouseMidY = cursorY - displayHeight / 2 - (posY);
+
+    //console.log(mouseX - (displayWidth / 2), mouseY - (displayHeight / 2));
+    
+    mouseInFrame = ((cursorX >= 0 && cursorX < displayWidth) && (cursorY >= 0 && cursorY < displayHeight))
+    
+    //console.log(mouseX, mouseY, mouseInFrame)
+
+    logInfo();
+
+    render();
+  }
+
+  const wheel = (e) => {
+    e.preventDefault();
+
+    if (mouseInFrame) {
+      zoom1 = (zoom1 - (e.deltaY / 1000)).clamp(0, 100);
+      const oldZoom = zoom;
+      zoom = Math.floor(zoom1 * 2) / 2;
+
+      if (zoom - oldZoom !== 0) {
+        // const oldZoom = zoom;
+        // zoom = (zoom - (e.deltaY / 1000)).clamp(0, 100);
+    
+        const midMouseX = cursorX - displayWidth/2;
+        const midMouseY = cursorY - displayHeight/2;
+        //const centerDifference = mouse
+
+        posX += midMouseX * (zoom - oldZoom);
+        posY += midMouseY * (zoom - oldZoom);
+      
+        //console.log("wheel");
+        //console.log(e);
+
+        render();
+      }
+    }
+  }
+
+  const touch = (e) => {
+    e.preventDefault();
+
+    // console.log("touch")
+    // console.log(e)
+  }
+
+  const mouseout = (e) => {
+    mouseInFrame = false;
+    render();
+  }
+
+  //window.onresize(resize)
+
+  if (ctx) {
+    ctx.imageSmoothingEnabled = false;
+
+    window.addEventListener("resize", resize);
+    window.addEventListener("mouseout", mouseout);
+    document.addEventListener("mousemove", changeMousePos);
+    document.addEventListener("wheel", wheel, { passive: false });
+    document.addEventListener("touchmove", touch, { passive: false });
+
+    image.addEventListener("load", render)
+
+    render();
+    resize();
+  }
+
+  // window.addEventListener("load", () => {
+  //     "use strict";
+
+  //     if ("serviceWorker" in navigator && document.URL.split(":")[0] !== "file") {
+  //       navigator.serviceWorker.register("./sw.js");
+  //     }
+  // })
+})()
