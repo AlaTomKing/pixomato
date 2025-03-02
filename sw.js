@@ -44,6 +44,7 @@ async function fetchAssets(e) {
         const response = await fetch(e.request);
         return response;
     } catch (err) {
+        console.log("error fetching assets: " + err)
         const cache = await caches.open(CACHE_NAME);
         return cache.match(e.request);
     }
