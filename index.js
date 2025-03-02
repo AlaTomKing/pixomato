@@ -34,7 +34,7 @@
 
   let displayWidth, displayHeight
 
-  let zoom = 2; // 1: 100%
+  let zoom = 0.3; // 1: 100%
 
   let posX = 0; // 0 is center
   let posY = 0; // 0 is center
