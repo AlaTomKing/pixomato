@@ -1,6 +1,6 @@
 "use strict";
 
-(() => { 
+(() => {
   const black = (text) => (`\x1b[30m${text}`)
   const red = (text) => (`\x1b[31m${text}`)
   const green = (text) => (`\x1b[32m${text}`)
@@ -71,7 +71,7 @@
   const insertImage = (x, y, w, h) => {
     ctx.drawImage(image, 0, 0, 1924, 1082, x * res, y * res, w * res, h * res);
   }
-  
+
   const setLineWidth = (width) => {
     ctx.lineWidth = width;
   }
@@ -79,16 +79,16 @@
   const dashedLine = (x0, y0, x1, y1) => {
     ctx.beginPath();
     ctx.setLineDash([10, 10]);
-    ctx.moveTo(x0*res, y0*res);
-    ctx.lineTo(x1*res, y1*res);
+    ctx.moveTo(x0 * res, y0 * res);
+    ctx.lineTo(x1 * res, y1 * res);
     ctx.stroke();
   }
 
   const line = (x0, y0, x1, y1) => {
     ctx.beginPath();
     ctx.setLineDash([]);
-    ctx.moveTo(x0*res, y0*res);
-    ctx.lineTo(x1*res, y1*res);
+    ctx.moveTo(x0 * res, y0 * res);
+    ctx.lineTo(x1 * res, y1 * res);
     ctx.stroke();
   }
 
@@ -160,7 +160,7 @@
 
     //requestAnimationFrame(render)
   }
-  
+
   const logInfo = () => {
     const midX = displayWidth / 2 - (posX);
     const midY = displayHeight / 2 - (posY);
@@ -203,9 +203,9 @@
     mouseMidY = cursorY - displayHeight / 2 - (posY);
 
     //console.log(mouseX - (displayWidth / 2), mouseY - (displayHeight / 2));
-    
+
     mouseInFrame = ((cursorX >= 0 && cursorX < displayWidth) && (cursorY >= 0 && cursorY < displayHeight))
-    
+
     //console.log(mouseX, mouseY, mouseInFrame)
 
     render();
@@ -218,8 +218,8 @@
       if (e.ctrlKey) {
         const oldZoom = zoom;
         const i = Math.log2(zoom) - e.deltaY * 0.025; //0.0025;
-        zoom = (2**i).clamp(0.01,100)
-  
+        zoom = (2 ** i).clamp(0.01, 100)
+
         if (zoom - oldZoom !== 0) {
           const midX = displayWidth / 2 - (posX);
           const midY = displayHeight / 2 - (posY);
@@ -228,18 +228,18 @@
           const cursorYFrame = (cursorY).clamp(midY - (canvasSizeY * oldZoom) / 2, midY + (canvasSizeY * oldZoom) / 2)
 
           console.log(cursorXFrame, cursorYFrame, cursorX, cursorY)
-  
+
           const cursorMidX = cursorXFrame - midX;
           const cursorMidY = cursorYFrame - midY;
-  
+
           const zoomDelta = (zoom - oldZoom)
-  
+
           const zoomDiffX = cursorMidX / oldZoom * zoomDelta;
           const zoomDiffY = cursorMidY / oldZoom * zoomDelta;
-  
+
           posX += zoomDiffX;
           posY += zoomDiffY;
-  
+
           render();
         }
       } else {
@@ -247,7 +247,7 @@
         posY += e.deltaY;
       }
     }
-    
+
     if ((canvasSizeX * zoom) < displayWidth) {
       posX = posX.clamp(-displayWidth / 2, displayWidth / 2);
     } else {
@@ -259,7 +259,7 @@
     } else {
       posY = posY.clamp(-canvasSizeY * zoom / 2, canvasSizeY * zoom / 2);
     }
-    
+
     render();
   }
 
@@ -277,19 +277,25 @@
 
   //window.onresize(resize)
 
-  if (ctx) {
-    ctx.imageSmoothingEnabled = false;
+  window.addEventListener("load", () => {
+    if (ctx) {
+      ctx.imageSmoothingEnabled = false;
 
-    window.addEventListener("resize", resize);
-    window.addEventListener("mouseout", mouseout);
+      window.addEventListener("resize", resize);
+      window.addEventListener("mouseout", mouseout);
 
-    document.addEventListener("mousemove", changeMousePos);
-    document.addEventListener("wheel", wheel, { passive: false });
-    document.addEventListener("touchmove", touch, { passive: false });
+      document.addEventListener("mousemove", changeMousePos);
+      document.addEventListener("wheel", wheel, { passive: false });
+      document.addEventListener("touchmove", touch, { passive: false });
 
-    image.addEventListener("load", render)
+      image.addEventListener("load", render)
 
-    render();
-    resize();
-  }
+      render();
+      resize();
+    }
+
+    if ("serviceWorker" in navigator && document.URL.split(":")[0] !== "file") {
+      navigator.serviceWorker.register("./sw.js");
+    }
+  })
 })()
