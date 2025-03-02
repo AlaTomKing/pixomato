@@ -29,15 +29,15 @@
 
   let cursorX, cursorY = 0;
 
-  let canvasSizeX = 640;
-  let canvasSizeY = 360;
+  let canvasSizeX = 3840;
+  let canvasSizeY = 2160;
 
   let displayWidth, displayHeight
 
-  let posX = -40; // 0 is center
-  let posY = -20; // 0 is center
-
   let zoom = 2; // 1: 100%
+
+  let posX = 0; // 0 is center
+  let posY = 0; // 0 is center
 
   let mouseMidX = 0;
   let mouseMidY = 0;
@@ -106,10 +106,10 @@
     ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
 
     // MAIN FRAME
-    ctx.globalAlpha = 0.3
+    //ctx.globalAlpha = 0.4
     setRGBFill(255, 255, 255, 0.3);
     insertImage((displayWidth / 2) - (canvasSizeX * zoom / 2) - posX, (displayHeight / 2) - (canvasSizeY * zoom / 2) - posY, canvasSizeX * zoom, canvasSizeY * zoom);
-    ctx.globalAlpha = 1
+    //ctx.globalAlpha = 1
 
     // MOUSE LINE
     /*if (mouseInFrame) {
@@ -149,6 +149,13 @@
     if (mouseInFrame) {
       setHexFill("#0000ff66");
       fillRect((cursorX - rectSize / 2), (cursorY - rectSize / 2), rectSize, rectSize);
+
+      setHexFill("#00ff0066");
+      fillRect(
+        (cursorX).clamp(midX - (canvasSizeX * zoom) / 2, midX + (canvasSizeX * zoom) / 2) - rectSize / 2,
+        (cursorY).clamp(midY - (canvasSizeY * zoom) / 2, midY + (canvasSizeY * zoom) / 2) - rectSize / 2,
+        rectSize,
+        rectSize);
     }*/
 
     //requestAnimationFrame(render)
@@ -208,28 +215,52 @@
     e.preventDefault();
 
     if (mouseInFrame) {
-      const oldZoom = zoom;
-      const i = Math.log2(zoom) - e.deltaY * 0.0025;
-      zoom = (2**i).clamp(0.001,100)
+      if (e.ctrlKey) {
+        const oldZoom = zoom;
+        const i = Math.log2(zoom) - e.deltaY * 0.025; //0.0025;
+        zoom = (2**i).clamp(0.01,100)
+  
+        if (zoom - oldZoom !== 0) {
+          const midX = displayWidth / 2 - (posX);
+          const midY = displayHeight / 2 - (posY);
 
-      if (zoom - oldZoom !== 0) {
-        const midX = displayWidth / 2 - (posX);
-        const midY = displayHeight / 2 - (posY);
+          const cursorXFrame = (cursorX).clamp(midX - (canvasSizeX * oldZoom) / 2, midX + (canvasSizeX * oldZoom) / 2)
+          const cursorYFrame = (cursorY).clamp(midY - (canvasSizeY * oldZoom) / 2, midY + (canvasSizeY * oldZoom) / 2)
 
-        const cursorMidX = cursorX - midX;
-        const cursorMidY = cursorY - midY;
-
-        const zoomDelta = (zoom - oldZoom)
-
-        const zoomDiffX = cursorMidX / oldZoom * zoomDelta;
-        const zoomDiffY = cursorMidY / oldZoom * zoomDelta;
-
-        posX += zoomDiffX;
-        posY += zoomDiffY;
-
-        render();
+          console.log(cursorXFrame, cursorYFrame, cursorX, cursorY)
+  
+          const cursorMidX = cursorXFrame - midX;
+          const cursorMidY = cursorYFrame - midY;
+  
+          const zoomDelta = (zoom - oldZoom)
+  
+          const zoomDiffX = cursorMidX / oldZoom * zoomDelta;
+          const zoomDiffY = cursorMidY / oldZoom * zoomDelta;
+  
+          posX += zoomDiffX;
+          posY += zoomDiffY;
+  
+          render();
+        }
+      } else {
+        posX += e.deltaX;
+        posY += e.deltaY;
       }
     }
+    
+    if ((canvasSizeX * zoom) < displayWidth) {
+      posX = posX.clamp(-displayWidth / 2, displayWidth / 2);
+    } else {
+      posX = posX.clamp(-canvasSizeX * zoom / 2, canvasSizeX * zoom / 2);
+    }
+
+    if ((canvasSizeY * zoom) < displayHeight) {
+      posY = posY.clamp(-displayHeight / 2, displayHeight / 2);
+    } else {
+      posY = posY.clamp(-canvasSizeY * zoom / 2, canvasSizeY * zoom / 2);
+    }
+    
+    render();
   }
 
   const touch = (e) => {
@@ -251,6 +282,7 @@
 
     window.addEventListener("resize", resize);
     window.addEventListener("mouseout", mouseout);
+
     document.addEventListener("mousemove", changeMousePos);
     document.addEventListener("wheel", wheel, { passive: false });
     document.addEventListener("touchmove", touch, { passive: false });
