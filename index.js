@@ -268,12 +268,12 @@
 
     // console.log("touch")
     // console.log(e)
-  }
+  };
 
   const mouseout = (e) => {
     mouseInFrame = false;
     render();
-  }
+  };
 
   //window.onresize(resize)
 
@@ -292,10 +292,10 @@
 
       render();
       resize();
-    }
 
-    if ("serviceWorker" in navigator && document.URL.split(":")[0] !== "file") {
-      navigator.serviceWorker.register("./sw.js");
+      if ("serviceWorker" in navigator && document.URL.split(":")[0] !== "file") {
+        navigator.serviceWorker.register("./sw.js");
+      }
     }
-  })
+  });
 })()
