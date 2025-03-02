@@ -38,7 +38,6 @@
   let posY = -20; // 0 is center
 
   let zoom = 2; // 1: 100%
-  let zoom1 = 2;
 
   let mouseMidX = 0;
   let mouseMidY = 0;
@@ -113,7 +112,7 @@
     ctx.globalAlpha = 1
 
     // MOUSE LINE
-    if (mouseInFrame) {
+    /*if (mouseInFrame) {
       setLineWidth(10);
 
       setHexStroke("#0000ff66");
@@ -150,7 +149,8 @@
     if (mouseInFrame) {
       setHexFill("#0000ff66");
       fillRect((cursorX - rectSize / 2), (cursorY - rectSize / 2), rectSize, rectSize);
-    }
+    }*/
+
     //requestAnimationFrame(render)
   }
   
@@ -201,8 +201,6 @@
     
     //console.log(mouseX, mouseY, mouseInFrame)
 
-    logInfo();
-
     render();
   }
 
@@ -210,20 +208,35 @@
     e.preventDefault();
 
     if (mouseInFrame) {
-      zoom1 = (zoom1 - (e.deltaY / 1000)).clamp(0, 100);
+      //zoom1 = (zoom1 - (e.deltaY / 1000)).clamp(0.001, 100);
       const oldZoom = zoom;
-      zoom = Math.floor(zoom1 * 2) / 2;
+      const i = Math.log2(zoom) - e.deltaY * 0.0025;
+      //zoom = Math.floor(zoom1 * 2) / 2;
+      //zoom = (zoom - (e.deltaY / 1000)).clamp(0.001, 100);
+      zoom = (2**i).clamp(0.001,100)
 
       if (zoom - oldZoom !== 0) {
         // const oldZoom = zoom;
         // zoom = (zoom - (e.deltaY / 1000)).clamp(0, 100);
+
+        const midX = displayWidth / 2 - (posX);
+        const midY = displayHeight / 2 - (posY);
+
+        const cursorMidX = cursorX - midX;
+        const cursorMidY = cursorY - midY;
+
+        const zoomDelta = (zoom - oldZoom)
     
-        const midMouseX = cursorX - displayWidth/2;
-        const midMouseY = cursorY - displayHeight/2;
+        //const midMouseX = cursorX - displayWidth/2;
+        //const midMouseY = cursorY - displayHeight / 2;
+
+        const zoomDiffX = cursorMidX / oldZoom * zoomDelta;
+        const zoomDiffY = cursorMidY / oldZoom * zoomDelta;
+        
         //const centerDifference = mouse
 
-        posX += midMouseX * (zoom - oldZoom);
-        posY += midMouseY * (zoom - oldZoom);
+        posX += zoomDiffX;
+        posY += zoomDiffY;
       
         //console.log("wheel");
         //console.log(e);
