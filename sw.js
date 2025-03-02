@@ -14,7 +14,6 @@ const STATIC_ASSETS = [
 
 async function preCache() {
     const cache = await caches.open(CACHE_NAME);
-    self.skipWaiting();
     return cache.addAll(STATIC_ASSETS);
 }
 

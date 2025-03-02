@@ -292,10 +292,10 @@
 
       render();
       resize();
+    }
 
-      if (navigator.serviceWorker) {
-        navigator.serviceWorker.register("./sw.js");
-      }
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.register("./sw.js");
     }
   });
 })()
