@@ -37,8 +37,8 @@ let zoom; // 1: 100%
 
   let cursorX, cursorY = 0;
 
-  let canvasSizeX = 45;
-  let canvasSizeY = 30;
+  let canvasSizeX = 2;
+  let canvasSizeY = 2;
 
   let currentPixelX = 1;
   let currentPixelY = 0;
@@ -86,6 +86,10 @@ let zoom; // 1: 100%
     ctx.fillRect(x * res, y * res, w * res, h * res);
   }
 
+  const strokeRect = (x, y, w, h) => {
+    ctx.strokeRect(x * res, y * res, w * res, h * res);
+  }
+
   const insertImage = (x, y, w, h) => {
     ctx.drawImage(image, 0, 0, 1924, 1082, x * res, y * res, w * res, h * res);
   }
@@ -122,22 +126,35 @@ let zoom; // 1: 100%
     // MAIN FRAME
     //ctx.globalAlpha = 0.4
     setRGBFill(255, 255, 255, 1);
-    fillRect((displayWidth / 2) - (canvasSizeX * zoom / 2) - posX, (displayHeight / 2) - (canvasSizeY * zoom / 2) - posY, canvasSizeX * zoom, canvasSizeY * zoom);
+    fillRect(
+      ((displayWidth / 2) - (canvasSizeX * zoom / 2) - posX),
+      ((displayHeight / 2) - (canvasSizeY * zoom / 2) - posY),
+      (canvasSizeX * zoom),
+      (canvasSizeY * zoom));
     //ctx.globalAlpha = 1
+
+    console.log(canvasSizeX * zoom, canvasSizeX * zoom);
 
     for (const [key, value] of Object.entries(pixels)) {
       let [pixelX, pixelY] = key.split(":");
 
+      //const cellSize = canvasEl.width / canvasSizeX
+        
       setRGBFill(0, 0, 0, 1);
-      fillRect((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX + pixelX * zoom, (displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY + pixelY * zoom, zoom, zoom)
+      fillRect(
+        ((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX + pixelX * zoom),
+        ((displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY + pixelY * zoom),
+        (zoom),
+        (zoom)
+      )
     }
 
-    if (mouseInCanvas) {
-      setRGBFill(0, 128, 0, 1);
-      fillRect((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX + currentPixelX * zoom, (displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY + currentPixelY * zoom, zoom, zoom)
-    }
+    //if (mouseInCanvas) {
+      setRGBFill(0, 0, 0, 1);
+      strokeRect((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX + currentPixelX * zoom, (displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY + currentPixelY * zoom, Math.ceil(zoom), Math.ceil(zoom))
+    //}
 
-    if (showGrid) {
+    /*if (showGrid) {
       setLineWidth(1);
       setHexStroke("#000")
 
@@ -151,7 +168,7 @@ let zoom; // 1: 100%
       for (let i = 1; i < canvasSizeY; i++) {
         line(startX, startY + i * zoom, (displayWidth / 2) + (canvasSizeX * zoom / 2) - posX, startY + i * zoom)
       }
-    }
+    }*/
 
     // MOUSE LINE
     /*if (mouseInFrame) {
@@ -323,14 +340,12 @@ let zoom; // 1: 100%
     mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) &&
       cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
 
-    if (mouseInCanvas) {
-      currentPixelX = Math.floor((cursorX - (displayWidth / 2 - canvasSizeX / 2 * zoom - posX)) / zoom)
-      currentPixelY = Math.floor((cursorY - (displayHeight / 2 - canvasSizeY / 2 * zoom - posY)) / zoom)
+    currentPixelX = Math.floor((cursorX - (displayWidth / 2 - canvasSizeX / 2 * zoom - posX)) / zoom)
+    currentPixelY = Math.floor((cursorY - (displayHeight / 2 - canvasSizeY / 2 * zoom - posY)) / zoom)
 
-      if (mouseDown) {
-        //drawLine(oldX, oldY, cursorX, cursorY);
-        drawPixel(cursorX, cursorY);
-      }
+    if (mouseDown) {
+      //drawLine(oldX, oldY, cursorX, cursorY);
+      drawPixel(cursorX, cursorY);
     }
 
     //console.log(mouseX - (displayWidth / 2), mouseY - (displayHeight / 2));
@@ -378,28 +393,30 @@ let zoom; // 1: 100%
     }
 
     if ((canvasSizeX * zoom) < displayWidth) {
-      posX = posX.clamp(-displayWidth / 2, displayWidth / 2);
+      posX = (posX.clamp(-displayWidth / 2, displayWidth / 2));
     } else {
-      posX = posX.clamp(-canvasSizeX * zoom / 2, canvasSizeX * zoom / 2);
+      posX = (posX.clamp(-canvasSizeX * zoom / 2, canvasSizeX * zoom / 2));
     }
 
     if ((canvasSizeY * zoom) < displayHeight) {
-      posY = posY.clamp(-displayHeight / 2, displayHeight / 2);
+      posY = (posY.clamp(-displayHeight / 2, displayHeight / 2));
     } else {
-      posY = posY.clamp(-canvasSizeY * zoom / 2, canvasSizeY * zoom / 2);
+      posY = (posY.clamp(-canvasSizeY * zoom / 2, canvasSizeY * zoom / 2))
     }
+
+    console.log(posX,posY)
 
     mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) &&
       cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
 
-    if (mouseInCanvas) {
+    //if (mouseInCanvas) {
       currentPixelX = Math.floor((cursorX - (displayWidth / 2 - canvasSizeX / 2 * zoom - posX)) / zoom)
       currentPixelY = Math.floor((cursorY - (displayHeight / 2 - canvasSizeY / 2 * zoom - posY)) / zoom)
 
       if (mouseDown) {
         drawPixel();
       }
-    }
+    //}
 
     render();
   }
@@ -419,9 +436,9 @@ let zoom; // 1: 100%
   const mousedown = (e) => {
     mouseDown = true;
 
-    if (mouseInCanvas) {
+    //if (mouseInCanvas) {
       drawPixel();
-    }
+    //}
 
     render();
   }

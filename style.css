@@ -137,6 +137,8 @@ button:hover:active {
     left: 0px;
     top: 32px;
 
+    image-rendering: pixelated;
+
     background-color: rgb(40,40,40,0.5);
 }
 
