@@ -54,7 +54,7 @@ let zoom; // 1: 100%
 
   let mouseDown = false;
 
-  if (canvasSizeX/canvasSizeY > displayWidth/displayHeight) {
+  if (canvasSizeX / canvasSizeY > displayWidth / displayHeight) {
     zoom = ((displayWidth) / (canvasSizeX * 1.2)).clamp(0.01, 100)
   } else {
     zoom = ((displayHeight) / (canvasSizeY * 1.2)).clamp(0.01, 100)
@@ -125,7 +125,7 @@ let zoom; // 1: 100%
     fillRect((displayWidth / 2) - (canvasSizeX * zoom / 2) - posX, (displayHeight / 2) - (canvasSizeY * zoom / 2) - posY, canvasSizeX * zoom, canvasSizeY * zoom);
     //ctx.globalAlpha = 1
 
-    for (const [key, value] of Object.entries(pixels)) { 
+    for (const [key, value] of Object.entries(pixels)) {
       let [pixelX, pixelY] = key.split(":");
 
       setRGBFill(0, 0, 0, 1);
@@ -207,6 +207,78 @@ let zoom; // 1: 100%
     pixels[`${currentPixelX}:${currentPixelY}`] = true;
   }
 
+  const drawLine = (x0, y0, x1, y1) => {
+    /*
+    psuedocode from wikipedia (dont delete incase of forgeting):
+
+    1.
+    dx = x2 − x1
+    dy = y2 − y1
+
+    for x from x1 to x2 do
+        y = y1 + dy × (x − x1) / dx
+        plot(x,y)
+
+    2.
+    plotLine(x0, y0, x1, y1)
+    dx = x1 - x0
+    dy = y1 - y0
+    D = 2*dy - dx
+    y = y0
+
+    for x from x0 to x1
+        plot(x, y)
+        if D > 0
+            y = y + 1
+            D = D - 2*dx
+        end if
+        D = D + 2*dy
+    */
+
+    /*let dx = x2 - x1;
+    let dy = y2 - y1;
+
+    if (x1 < x2)
+        for (let x = x1; x <= x2; x++) {
+            let y = Math.round(y1 + dy * (x - x1) / dx)
+
+            let index = 4 * (this.canvas.width * y + x);
+
+            var cArray = color.substring(4, color.length - 1).split(',')
+            this.pixelImageData.data[index] = cArray[0];
+            this.pixelImageData.data[index + 1] = cArray[1];
+            this.pixelImageData.data[index + 2] = cArray[2];
+            this.pixelImageData.data[index + 3] = 255;
+        }
+    else
+        for(let x = x2; x <= x1; x++) {
+            let y = Math.round(y1 + dy * (x - x1) / dx)
+
+            let index = 4 * (this.canvas.width * y + x);
+
+            var cArray = color.substring(4, color.length - 1).split(',')
+            this.pixelImageData.data[index] = cArray[0];
+            this.pixelImageData.data[index + 1] = cArray[1];
+            this.pixelImageData.data[index + 2] = cArray[2];
+            this.pixelImageData.data[index + 3] = 255;
+        }*/
+
+    let dx = Math.abs(x1 - x0);
+    let dy = Math.abs(y1 - y0);
+    let sx = (x0 < x1) ? 1 : -1;
+    let sy = (y0 < y1) ? 1 : -1;
+    let err = dx - dy;
+
+    while (true) {
+      drawPixel(x0, y0);
+
+      if ((x0 === x1) && (y0 === y1)) break;
+      let e2 = 2 * err;
+      if (e2 > -dy) { err -= dy; x0 += sx; }
+      if (e2 < dx) { err += dx; y0 += sy; }
+    }
+  }
+
   const logInfo = () => {
     const midX = displayWidth / 2 - (posX);
     const midY = displayHeight / 2 - (posY);
@@ -242,18 +314,22 @@ let zoom; // 1: 100%
     // console.log(e)
     // console.log("client:", e.clientX, e.clientY)
     // console.log("screen:", e.screenX, e.screenY)
+    const oldX = cursorX;
+    const oldY = cursorY;
+
     cursorX = e.clientX - canvasEl.offsetLeft;
     cursorY = e.clientY - canvasEl.offsetTop;
 
-    mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) && 
-    cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
+    mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) &&
+      cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
 
     if (mouseInCanvas) {
       currentPixelX = Math.floor((cursorX - (displayWidth / 2 - canvasSizeX / 2 * zoom - posX)) / zoom)
       currentPixelY = Math.floor((cursorY - (displayHeight / 2 - canvasSizeY / 2 * zoom - posY)) / zoom)
 
       if (mouseDown) {
-        drawPixel();
+        //drawLine(oldX, oldY, cursorX, cursorY);
+        drawPixel(cursorX, cursorY);
       }
     }
 
@@ -275,7 +351,7 @@ let zoom; // 1: 100%
         const i = Math.log2(zoom) - e.deltaY * 0.025; //0.0025;
         zoom = (2 ** i).clamp(0.01, 100)
 
-        showGrid = (zoom >= 5) 
+        showGrid = (zoom >= 5)
 
         if (zoom - oldZoom !== 0) {
           const midX = displayWidth / 2 - (posX);
@@ -313,8 +389,8 @@ let zoom; // 1: 100%
       posY = posY.clamp(-canvasSizeY * zoom / 2, canvasSizeY * zoom / 2);
     }
 
-    mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) && 
-    cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
+    mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) &&
+      cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
 
     if (mouseInCanvas) {
       currentPixelX = Math.floor((cursorX - (displayWidth / 2 - canvasSizeX / 2 * zoom - posX)) / zoom)
