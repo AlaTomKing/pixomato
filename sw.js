@@ -1,7 +1,7 @@
 // Credit to Daniel Amber for the tutorial!
 // https://www.youtube.com/watch?v=rxQJtPnZUMY
 
-const CACHE_NAME = "pixomato-offline";
+/*const CACHE_NAME = "pixomato-offline";
 const STATIC_ASSETS = [
     "/",
     "/index.html",
@@ -52,4 +52,4 @@ async function fetchAssets(e) {
 self.addEventListener("fetch", (e) => {
     console.log("sw fetched");
     e.respondWith(fetchAssets(e));
-})
+})*/

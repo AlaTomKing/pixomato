@@ -18,6 +18,10 @@
   const bgCyan = (text) => (`\x1b[46m${text}\x1b[0m`)
   const bgWhite = (text) => (`\x1b[47m${text}\x1b[0m`)
 
+  Number.prototype.clamp = function (min, max) {
+    return Math.min(Math.max(this, min), max);
+  };
+
   document.querySelector("#menu-github-btn").addEventListener("click", () => {
     window.open("https://github.com/AlaTomKing/pixomato");
   })
@@ -32,9 +36,8 @@
   let canvasSizeX = 3840;
   let canvasSizeY = 2160;
 
-  let displayWidth, displayHeight
-
-  let zoom = 0.3; // 1: 100%
+  let displayWidth = window.innerWidth - canvasEl.offsetLeft;
+  let displayHeight = window.innerHeight - canvasEl.offsetTop;
 
   let posX = 0; // 0 is center
   let posY = 0; // 0 is center
@@ -43,6 +46,16 @@
   let mouseMidY = 0;
 
   let mouseInFrame = false;
+
+  let zoom = 1; // 1: 100%
+
+  console.log(canvasSizeX/canvasSizeY, displayWidth/displayHeight)
+
+  if (canvasSizeX/canvasSizeY > displayWidth/displayHeight) {
+    zoom = ((displayWidth) / (canvasSizeX * 1.2)).clamp(0.01, 100)
+  } else {
+    zoom = ((displayHeight) / (canvasSizeY * 1.2)).clamp(0.01, 100)
+  }
 
   let image = new Image()
   image.src = "./resources/testBackground.png"
@@ -91,10 +104,6 @@
     ctx.lineTo(x1 * res, y1 * res);
     ctx.stroke();
   }
-
-  Number.prototype.clamp = function (min, max) {
-    return Math.min(Math.max(this, min), max);
-  };
 
   const render = () => {
     const x = window.scrollX + window.innerWidth / 2;
