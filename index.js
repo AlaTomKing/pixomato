@@ -294,8 +294,8 @@
       resize();
     }
 
-    if (navigator.serviceWorker) {
+    /*if ("serviceWorker" in navigator && document.URL.split(":")[0] !== "file") {
       navigator.serviceWorker.register("./sw.js");
-    }
+    }*/
   });
 })()
