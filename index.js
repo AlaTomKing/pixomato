@@ -1,5 +1,7 @@
 "use strict";
 
+let zoom; // 1: 100%
+
 (() => {
   const black = (text) => (`\x1b[30m${text}`)
   const red = (text) => (`\x1b[31m${text}`)
@@ -29,6 +31,8 @@
   const canvasEl = document.getElementById("drawing-canvas");
   const ctx = canvasEl.getContext("2d");
 
+  let pixels = {};
+
   const rectSize = 10;
 
   let cursorX, cursorY = 0;
@@ -48,13 +52,15 @@
   let mouseInFrame = false;
   let mouseInCanvas = false;
 
-  let zoom; // 1: 100%
+  let mouseDown = false;
 
   if (canvasSizeX/canvasSizeY > displayWidth/displayHeight) {
     zoom = ((displayWidth) / (canvasSizeX * 1.2)).clamp(0.01, 100)
   } else {
     zoom = ((displayHeight) / (canvasSizeY * 1.2)).clamp(0.01, 100)
   }
+
+  let showGrid = (zoom >= 5);
 
   let image = new Image()
   image.src = "./resources/testBackground.png"
@@ -119,9 +125,32 @@
     fillRect((displayWidth / 2) - (canvasSizeX * zoom / 2) - posX, (displayHeight / 2) - (canvasSizeY * zoom / 2) - posY, canvasSizeX * zoom, canvasSizeY * zoom);
     //ctx.globalAlpha = 1
 
-    if (mouseInCanvas) {
+    for (const [key, value] of Object.entries(pixels)) { 
+      let [pixelX, pixelY] = key.split(":");
+
       setRGBFill(0, 0, 0, 1);
+      fillRect((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX + pixelX * zoom, (displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY + pixelY * zoom, zoom, zoom)
+    }
+
+    if (mouseInCanvas) {
+      setRGBFill(0, 128, 0, 1);
       fillRect((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX + currentPixelX * zoom, (displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY + currentPixelY * zoom, zoom, zoom)
+    }
+
+    if (showGrid) {
+      setLineWidth(1);
+      setHexStroke("#000")
+
+      const startX = (displayWidth / 2) - (canvasSizeX * zoom / 2) - posX
+      const startY = (displayHeight / 2) - (canvasSizeY * zoom / 2) - posY
+
+      for (let i = 1; i < canvasSizeX; i++) {
+        line(startX + i * zoom, startY, startX + i * zoom, (displayHeight / 2) + (canvasSizeY * zoom / 2) - posY)
+      }
+
+      for (let i = 1; i < canvasSizeY; i++) {
+        line(startX, startY + i * zoom, (displayWidth / 2) + (canvasSizeX * zoom / 2) - posX, startY + i * zoom)
+      }
     }
 
     // MOUSE LINE
@@ -174,6 +203,10 @@
     //requestAnimationFrame(render)
   }
 
+  const drawPixel = () => {
+    pixels[`${currentPixelX}:${currentPixelY}`] = true;
+  }
+
   const logInfo = () => {
     const midX = displayWidth / 2 - (posX);
     const midY = displayHeight / 2 - (posY);
@@ -218,6 +251,10 @@
     if (mouseInCanvas) {
       currentPixelX = Math.floor((cursorX - (displayWidth / 2 - canvasSizeX / 2 * zoom - posX)) / zoom)
       currentPixelY = Math.floor((cursorY - (displayHeight / 2 - canvasSizeY / 2 * zoom - posY)) / zoom)
+
+      if (mouseDown) {
+        drawPixel();
+      }
     }
 
     //console.log(mouseX - (displayWidth / 2), mouseY - (displayHeight / 2));
@@ -238,6 +275,8 @@
         const i = Math.log2(zoom) - e.deltaY * 0.025; //0.0025;
         zoom = (2 ** i).clamp(0.01, 100)
 
+        showGrid = (zoom >= 5) 
+
         if (zoom - oldZoom !== 0) {
           const midX = displayWidth / 2 - (posX);
           const midY = displayHeight / 2 - (posY);
@@ -255,8 +294,6 @@
 
           posX += zoomDiffX;
           posY += zoomDiffY;
-
-          render();
         }
       } else {
         posX += e.deltaX;
@@ -282,6 +319,10 @@
     if (mouseInCanvas) {
       currentPixelX = Math.floor((cursorX - (displayWidth / 2 - canvasSizeX / 2 * zoom - posX)) / zoom)
       currentPixelY = Math.floor((cursorY - (displayHeight / 2 - canvasSizeY / 2 * zoom - posY)) / zoom)
+
+      if (mouseDown) {
+        drawPixel();
+      }
     }
 
     render();
@@ -299,6 +340,20 @@
     render();
   };
 
+  const mousedown = (e) => {
+    mouseDown = true;
+
+    if (mouseInCanvas) {
+      drawPixel();
+    }
+
+    render();
+  }
+
+  const mouseup = (e) => {
+    mouseDown = false;
+  }
+
   //window.onresize(resize)
 
   window.addEventListener("load", () => {
@@ -307,6 +362,9 @@
 
       window.addEventListener("resize", resize);
       window.addEventListener("mouseout", mouseout);
+
+      document.addEventListener("mousedown", mousedown);
+      document.addEventListener("mouseup", mouseup);
 
       document.addEventListener("mousemove", changeMousePos);
       document.addEventListener("wheel", wheel, { passive: false });
