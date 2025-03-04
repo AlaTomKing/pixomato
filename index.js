@@ -132,9 +132,7 @@ let zoom; // 1: 100%
       (canvasSizeX * zoom),
       (canvasSizeY * zoom));
     //ctx.globalAlpha = 1
-
-    console.log(canvasSizeX * zoom, canvasSizeX * zoom);
-
+    
     for (const [key, value] of Object.entries(pixels)) {
       let [pixelX, pixelY] = key.split(":");
 
@@ -364,7 +362,9 @@ let zoom; // 1: 100%
       if (e.ctrlKey) {
         const oldZoom = zoom;
         const i = Math.log2(zoom) - e.deltaY * 0.025; //0.0025;
+        //zoom = (Math.floor((2 ** i)  * 100) / 100).clamp(0.01, 100)
         zoom = (2 ** i).clamp(0.01, 100)
+        console.log(Math.floor(zoom*100));
 
         showGrid = (zoom >= 5)
 
@@ -403,8 +403,6 @@ let zoom; // 1: 100%
     } else {
       posY = (posY.clamp(-canvasSizeY * zoom / 2, canvasSizeY * zoom / 2))
     }
-
-    console.log(posX,posY)
 
     mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) &&
       cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
