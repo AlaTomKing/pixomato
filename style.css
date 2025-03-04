@@ -139,7 +139,7 @@ button:hover:active {
 
     image-rendering: pixelated;
 
-    background-color: rgb(40,40,40,0.5);
+    background-color: rgb(40,40,40,0);
 }
 
 #play-button {
