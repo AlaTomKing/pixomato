@@ -341,7 +341,7 @@ let zoom; // 1: 100%
     currentPixelX = Math.floor((cursorX - (displayWidth / 2 - canvasSizeX / 2 * zoom - posX)) / zoom)
     currentPixelY = Math.floor((cursorY - (displayHeight / 2 - canvasSizeY / 2 * zoom - posY)) / zoom)
 
-    if (mouseDown) {
+    if (mouseDown && mouseInFrame) {
       //drawLine(oldX, oldY, cursorX, cursorY);
       drawPixel(cursorX, cursorY);
     }
@@ -411,7 +411,7 @@ let zoom; // 1: 100%
       currentPixelX = Math.floor((cursorX - (displayWidth / 2 - canvasSizeX / 2 * zoom - posX)) / zoom)
       currentPixelY = Math.floor((cursorY - (displayHeight / 2 - canvasSizeY / 2 * zoom - posY)) / zoom)
 
-      if (mouseDown) {
+      if (mouseDown && mouseInFrame) {
         drawPixel();
       }
     //}
@@ -435,7 +435,9 @@ let zoom; // 1: 100%
     mouseDown = true;
 
     //if (mouseInCanvas) {
+    if (mouseInFrame) {
       drawPixel();
+    }
     //}
 
     render();
