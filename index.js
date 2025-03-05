@@ -37,8 +37,8 @@ let zoom; // 1: 100%
 
   let cursorX, cursorY = 0;
 
-  let canvasSizeX = 2;
-  let canvasSizeY = 2;
+  let canvasSizeX = 360;
+  let canvasSizeY = 240;
 
   let currentPixelX = 1;
   let currentPixelY = 0;
