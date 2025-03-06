@@ -28,6 +28,7 @@ let zoom; // 1: 100%
     window.open("https://github.com/AlaTomKing/pixomato");
   })
 
+  const canvasWidget = document.getElementById("canvas-widget");
   const canvasEl = document.getElementById("drawing-canvas");
   const ctx = canvasEl.getContext("2d");
 
@@ -43,8 +44,8 @@ let zoom; // 1: 100%
   let currentPixelX = 1;
   let currentPixelY = 0;
 
-  let displayWidth = window.innerWidth - canvasEl.offsetLeft;
-  let displayHeight = window.innerHeight - canvasEl.offsetTop;
+  let displayWidth = canvasWidget.offsetWidth;
+  let displayHeight = canvasWidget.offsetHeight;
 
   let posX = 0; // 0 is center
   let posY = 0; // 0 is center
@@ -147,10 +148,10 @@ let zoom; // 1: 100%
       )
     }
 
-    //if (mouseInCanvas) {
+    if (mouseInFrame) {
       setRGBFill(0, 0, 0, 1);
       strokeRect((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX + currentPixelX * zoom, (displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY + currentPixelY * zoom, Math.ceil(zoom), Math.ceil(zoom))
-    //}
+    }
 
     /*if (showGrid) {
       setLineWidth(1);
@@ -313,8 +314,8 @@ let zoom; // 1: 100%
 
     ctx.scale(res, res);
 
-    displayWidth = window.innerWidth - canvasEl.offsetLeft;
-    displayHeight = window.innerHeight - canvasEl.offsetTop;
+    displayWidth = canvasWidget.offsetWidth;
+    displayHeight = canvasWidget.offsetHeight;
 
     canvasEl.style.width = displayWidth + "px";
     canvasEl.style.height = displayHeight + "px";
@@ -332,8 +333,8 @@ let zoom; // 1: 100%
     const oldX = cursorX;
     const oldY = cursorY;
 
-    cursorX = e.clientX - canvasEl.offsetLeft;
-    cursorY = e.clientY - canvasEl.offsetTop;
+    cursorX = e.clientX - canvasWidget.offsetLeft;
+    cursorY = e.clientY - canvasWidget.offsetTop;
 
     mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) &&
       cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
@@ -449,7 +450,7 @@ let zoom; // 1: 100%
 
   //window.onresize(resize)
 
-  window.addEventListener("load", () => {
+  //window.addEventListener("load", () => {
     if (ctx) {
       ctx.imageSmoothingEnabled = false;
 
@@ -472,5 +473,5 @@ let zoom; // 1: 100%
     /*if ("serviceWorker" in navigator && document.URL.split(":")[0] !== "file") {
       navigator.serviceWorker.register("./sw.js");
     }*/
-  });
+  //});
 })()
