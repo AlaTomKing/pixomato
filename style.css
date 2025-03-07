@@ -135,12 +135,12 @@ button:hover:active {
 #canvas-widget {
     position: absolute;
 
-    top: calc(32px + 3px);
-    left: calc(150px + 9px);
-    right: calc(300px + 9px);
+    top: 0px;
+    left: calc(150px + 6px);
+    right: calc(300px + 6px);
     /* bottom: 100px;*/
 
-    bottom: calc(200px + 9px);
+    bottom: calc(200px + 6px);
     /*left: 3px;*/
     /* right: 3px; */
 
@@ -157,23 +157,34 @@ button:hover:active {
     background-color: rgb(49, 52, 68);
 }
 
+#main-frame {
+    position: absolute;
+
+    top: 32px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+
+    margin: 3px;
+}
+
 #widget1 {
-    top: calc(32px + 3px);
-    left: 3px;
-    bottom: calc(200px + 9px);
+    top: 0px;
+    left: 0px;
+    bottom: calc(200px + 6px);
     width: 150px;
 }
 
 #widget2 {
-    left: 3px;
-    bottom: 3px;
-    right: 3px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
     height: 200px;
 }
 
 #widget3 {
-    top: calc(32px + 3px);
-    right: 3px;
-    bottom: calc(200px + 9px);
+    top: 0px;
+    right: 0px;
+    bottom: calc(200px + 6px);
     width: 300px;
 }
