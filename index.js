@@ -24,10 +24,11 @@ let zoom; // 1: 100%
     return Math.min(Math.max(this, min), max);
   };
 
-  document.querySelector("#menu-github-btn").addEventListener("click", () => {
+  document.getElementById("menu-github-btn").addEventListener("click", () => {
     window.open("https://github.com/AlaTomKing/pixomato");
   })
 
+  const mainFrame = document.getElementById("main-frame");
   const canvasWidget = document.getElementById("canvas-widget");
   const canvasEl = document.getElementById("drawing-canvas");
   const ctx = canvasEl.getContext("2d");
@@ -333,8 +334,8 @@ let zoom; // 1: 100%
     const oldX = cursorX;
     const oldY = cursorY;
 
-    cursorX = e.clientX - canvasWidget.offsetLeft;
-    cursorY = e.clientY - canvasWidget.offsetTop;
+    cursorX = e.clientX - canvasWidget.offsetLeft - mainFrame.offsetLeft;
+    cursorY = e.clientY - canvasWidget.offsetTop - mainFrame.offsetTop;
 
     mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) &&
       cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
