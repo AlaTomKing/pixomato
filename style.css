@@ -1,10 +1,39 @@
+:root {
+    --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    /*--font: "Ubuntu", sans-serif;*/
+
+    --tab-container-height: 21px;
+    --tab-padding: 7px;
+    --tab-font-size: 13px;
+    --tab-container-gap: 0px;
+    --tab-container-padding: 0px;
+
+    --widget-gap: 2px;
+
+    --stroke-size: 1px;
+}
+
 @media (prefers-color-scheme: dark) {
-    :root {
+    /* :root {
         --text-color: rgb(255,255,255);
-        --background-color: rgb(35, 37, 48);
-        --topbar-color: rgb(49, 52, 68);
+        --background-color: rgb(41, 44, 56); /* rgb(35, 37, 48) */
+        /* --topbar-color: rgb(49, 52, 68);
         --topbar-btn-hover-color: rgb(76, 81, 108);
-        --widget-color: rgb(49, 52, 68);
+        --widget-color: rgb(49, 52, 68); */
+        /*--tab-item-inactive-color: rgb(41, 44, 56);*/ /* rgb(45, 47, 64) */
+        /* --tab-background-color: rgb(41, 44, 56);
+        --stroke-color: rgb(35, 37, 48);
+    } */
+
+    :root {
+        --text-color: rgb(255, 255, 255);
+        --background-color: rgb(49, 49, 49);
+        --topbar-color: rgb(64, 64, 64);
+        --topbar-btn-hover-color: rgb(85, 85, 85);
+        --widget-color: rgb(64, 64, 64);
+        --tab-item-inactive-color: rgb(56, 56, 56);
+        --tab-background-color: rgb(55, 55, 55);
+        --stroke-color: rgb(35, 35, 35);
     }
 }
 
@@ -15,6 +44,9 @@
         --topbar-color: rgb(185, 185, 185);
         --topbar-btn-hover-color: rgb(160, 160, 160);
         --widget-color: rgb(185, 185, 185);
+        --tab-item-inactive-color: rgb(160,160,160);
+        --tab-background-color: rgb(170, 170, 170);
+        --stroke-color: rgb(120, 120, 120);
     }
 }
 
@@ -23,7 +55,7 @@ body {
     background-color: var(--background-color);
 
     margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: var(--font);
 
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -38,7 +70,7 @@ body {
 button {
     background-color: green;
     font-size: 18px;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: var(--font);
 }
 
 button:hover {
@@ -57,6 +89,7 @@ button:hover:active {
     height: 32px;
 
     background-color: var(--topbar-color);
+    outline: 1px solid var(--stroke-color);
 }
 
 #top-bar > .title {
@@ -74,7 +107,7 @@ button:hover:active {
 
 #top-bar > .bar-icon {
     position: absolute;
-    image-rendering: pixelated;
+    /* image-rendering: pixelated; */
     left: 9px;
     top: 6px;
     width: 20;
@@ -136,31 +169,100 @@ button:hover:active {
     height: 2em;
 }
 
-.widget {
-    position: absolute;
+.tab {
+    height: 100%;
+    width: 100%;
+
+    outline: var(--stroke-size) solid var(--stroke-color);
+}
+
+.tab > .tab-container {
+    display: flex;
+
+    flex-direction: row;
+    align-items: top;
+
+    gap: calc(var(--tab-container-gap) + var(--stroke-size));
+
+    position: relative;
+    height: var(--tab-container-height);
+    padding-top: var(--tab-container-padding);
+    padding-inline: var(--tab-container-padding);
+
+    background-color: var(--tab-background-color);
+    outline: var(--stroke-size) solid var(--stroke-color);
+}
+
+.tab > .tab-content {
+    position: relative;
+    bottom: 0px;
+    width: 100%;
+    top: var(--stroke-size);
+    height: calc(100% - var(--tab-container-height) - var(--stroke-size)  - var(--tab-container-padding));
+    /* top: calc(var(--tab-container-height) + var(--tab-container-gap)); */
 
     background-color: var(--widget-color);
 }
 
-#canvas-widget {
-    background-color: rgb(255,255,255,0);
+.tab-container > .tab-item, .tab-item-selected {
+    position: relative;
 
-    position: absolute;
+    outline: var(--stroke-size) solid var(--stroke-color);
+    
+    width: auto;
+    height: var(--tab-container-height);
 
     top: 0px;
-    left: calc(150px + 4px);
-    right: calc(300px + 4px);
-    /* bottom: 100px;*/
 
-    bottom: calc(200px + 4px);
-    /*left: 3px;*/
-    /* right: 3px; */
+    font-size: var(--tab-font-size);
 
-    /* image-rendering: pixelated; */
+    padding-inline: var(--tab-padding);
+
+    text-align: center;
+    vertical-align: middle;
+    line-height: var(--tab-container-height);
 }
 
-#play-button {
+.tab-container > .tab-item {
+    background-color: var(--tab-item-inactive-color);
+}
+
+.tab-container > .tab-item-selected {
+    height: calc(var(--tab-container-height) + var(--stroke-size));
+    background-color: var(--widget-color);
+}
+
+.widget {
     position: absolute;
+
+    height: 100%;
+    width: 100%;
+
+    background-color: var(--widget-color);
+}
+
+.horizontal-node {
+    display: flex;
+
+    align-items: stretch;
+
+    flex-direction: row;
+    
+    gap: calc(2 * var(--stroke-size) + var(--widget-gap) - 1px);
+
+    height: 100%;
+    width: 100%;
+}
+
+.vertical-node {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: calc(2 * var(--stroke-size) + var(--widget-gap) - 1px);
+
+    height: 100%;
+    width: 100%;
 }
 
 #main-frame {
@@ -171,7 +273,29 @@ button:hover:active {
     left: 0px;
     right: 0px;
 
-    margin: 3px;
+    margin:  calc(var(--stroke-size) + var(--widget-gap) - 1px);
+    margin-top: calc(var(--stroke-size) + var(--widget-gap));
+}
+
+/*#canvas-widget {
+    background-color: rgb(255,255,255,0);
+
+    position: absolute;
+
+    top: 0px;
+    left: calc(150px + 4px);
+    right: calc(300px + 4px);
+    /* bottom: 100px;*/
+
+    /*bottom: calc(200px + 4px);*/
+    /*left: 3px;*/
+    /* right: 3px; */
+
+    /* image-rendering: pixelated; */
+/*}*/
+
+/*#play-button {
+    position: absolute;
 }
 
 #widget1 {
@@ -193,4 +317,4 @@ button:hover:active {
     right: 0px;
     bottom: calc(200px + 4px);
     width: 300px;
-}
+}*/
