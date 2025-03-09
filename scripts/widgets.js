@@ -1,6 +1,6 @@
 // This script is responsible for handling widgets in Pixomato
 
-(() => {
+
     const mainFrame = document.getElementById("main-frame");
 
     class vector2 {
@@ -70,8 +70,12 @@
             this.currentWidget = this.items.length;
         }
 
-        makeActive() {
+        makeActive(index) {
+            for (let i = 0; i < this.tabItems.length; i++) {
+                this.tabItems[i].className = "tab-item";
+            }
 
+            this.tabItems[index].className = "tab-item-selected"
         }
     }
 
@@ -151,6 +155,9 @@
     g.addWidget(gWidget);
     h.addWidget(hWidget);
     h.addWidget(iWidget);
+    h.addWidget(new widget("test"));
+    h.addWidget(new widget("testee"));
+    h.addWidget(new widget("test123"));
 
     dock1.addChild(dock2);
     dock1.addChild(h);
@@ -167,7 +174,8 @@
     dock4.addChild(d);
     dock4.addChild(e);
 
+    h.makeActive(1);
+
     mainFrame.appendChild(dock1.element)
 
     /*console.log("worky?")*/
-})();

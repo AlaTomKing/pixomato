@@ -3,7 +3,7 @@
 
 <head>
     <!-- Website basic fundamentals -->
-    <title>New Animation - Pixomato</title>
+    <title>Pixomato</title>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -11,13 +11,13 @@
     <link rel="icon" type="image/png" href="./resources/favicon.png">
     <link rel="stylesheet" href="style.css">
     <meta name="theme-color" content="#3765ad">
-        
+
     <!-- ios bookmark app (when u wanna download on ipad) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-title" content="Pixomato">
-    <meta name="apple-mobile-web-app-status-bar-style" content="#313444"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="#313444" />
     <link rel="apple-touch-icon" sizes="180x180" href="./resources/logo_ios.png">
-        
+
     <!-- android web app (i dont have an android tablet but) -->
     <meta name="mobile-web-app-capable" content="yes">
     <!-- <link rel="shortcut icon" sizes="196x196" href="youriconhighres.png">
@@ -40,46 +40,102 @@
     <meta property="og:image" content="https://alatomking.github.io/pixomato/resources/thumbnail.png">
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:alt" content="Use Pixomato now!">
+
+    <noscript>
+    <style>
+        #pixomato {
+            display: none
+        }
+
+        #no-js {
+            display: flex;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+        }
+
+        #no-js > #no-js-image {
+            width: 64px;
+            height: 64px;
+            image-rendering: pixelated;
+
+            background: url("./resources/logo_sad.png") 0px 0px;
+            background-size: cover;
+        }
+
+        #no-js > #no-js-image:hover {
+            background: url("./resources/logo_sad.png") 64px 0px;
+            background-size: cover;
+        }
+    </style>
+    </noscript>
 </head>
 
 <body>
-    <div id="top-bar">
-        <image class="bar-icon" src="./resources/logo_upscaled.png"></image>
-        <!-- <text class="title">Pixomato</text> -->
-        <div class="menu-container">
-            <div class="menu-tab-btn" aria-label="File">
-                <div class="menu-btn-label">File</div>
-            </div>
-            <div class="menu-tab-btn" aria-label="Edit">
-                <div class="menu-btn-label">Edit</div>
-            </div>
-            <div class="menu-tab-btn" aria-label="Select">
-                <div class="menu-btn-label">Select</div>
-            </div>
-            <div class="menu-tab-btn" aria-label="Insert">
-                <div class="menu-btn-label">Insert</div>
-            </div>
-            <div class="menu-tab-btn" aria-label="View">
-                <div class="menu-btn-label">View</div>
-            </div>
-            <div class="menu-tab-btn" aria-label="Window">
-                <div class="menu-btn-label">Window</div>
-            </div>
-            <div class="menu-tab-btn" aria-label="Help" id="menu-github-btn">
-                <div class="menu-btn-label">Help</div>
+    <noscript>
+    <span id="no-js">
+        <div id="no-js-image"></div>
+        <br>
+        Hi! I noticed you have JavaScript disabled!<br>
+        Unfortunately, Pixomato runs on JavaScript so you can't use<br>
+        the app without having JavaScript turned on.<br>
+        <br>
+        Thank you for visiting though!
+        <br><br>
+        <span style="color: #3765ad; font-weight: bold;">Please turn on JavaScript to use Pixomato.</span>
+    </span>
+    </noscript>
+
+    <div id="pixomato" style="height: 100%; width: 100%;">
+        <div id="top-bar">
+            <image class="bar-icon" src="./resources/logo_upscaled.png"></image>
+            <!-- <text class="title">Pixomato</text> -->
+            <div class="menu-container">
+                <div class="menu-tab-btn" aria-label="File">
+                    <div class="menu-btn-label">File</div>
+                </div>
+                <div class="menu-tab-btn" aria-label="Edit">
+                    <div class="menu-btn-label">Edit</div>
+                </div>
+                <div class="menu-tab-btn" aria-label="Select">
+                    <div class="menu-btn-label">Select</div>
+                </div>
+                <div class="menu-tab-btn" aria-label="Insert">
+                    <div class="menu-btn-label">Insert</div>
+                </div>
+                <div class="menu-tab-btn" aria-label="View">
+                    <div class="menu-btn-label">View</div>
+                </div>
+                <div class="menu-tab-btn" aria-label="Window">
+                    <div class="menu-btn-label">Window</div>
+                </div>
+                <div class="menu-tab-btn" aria-label="Help" id="menu-github-btn">
+                    <div class="menu-btn-label">Help</div>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="main-frame">
-        
-        <!-- <div class="widget" id="canvas-widget">
+        <div id="main-frame">
+
+            <!-- <div class="widget" id="canvas-widget">
             <canvas id="drawing-canvas"></canvas>
         </div>
         <div class="widget" id="widget1"></div>
         <div class="widget" id="widget2"></div>
         <div class="widget" id="widget3"></div> -->
+        </div>
     </div>
+
+    <script>
+        console.log("%c" + "Important!!!", "color: #ff3300; font-size: 300%; -webkit-text-stroke: 1px black; font-weight: bold;")
+        console.log("%c" + "Hi! If you are reading this from a console, don't put anything in, unless you know what the code you're putting is!", "font-size: 150%;")
+        console.log("%c" + "If you're here to mod the application, have fun! But be careful on what type of mod it is! You may be at risk of losing data!", "font-style: italic;")
+        console.log("Thank you for visiting my website!");
+    </script>
 
     <script src="scripts/widgets.js"></script>
     <!-- <div id="bottom-bar"></div> -->
