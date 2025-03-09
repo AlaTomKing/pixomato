@@ -130,13 +130,25 @@
     </div>
 
     <script>
-        console.log("%c" + "Important!!!", "color: #ff3300; font-size: 300%; -webkit-text-stroke: 1px black; font-weight: bold;")
-        console.log("%c" + "Hi! If you are reading this from a console, don't put anything in, unless you know what the code you're putting is!", "font-size: 150%;")
-        console.log("%c" + "If you're here to mod the application, have fun! But be careful on what type of mod it is! You may be at risk of losing data!", "font-style: italic;")
-        console.log("Thank you for visiting my website!");
+        const printWarning = (lang) => {
+            if (lang === "en") {
+                console.log("%c" + "Important!!!", "color: #ff3300; font-size: 300%; -webkit-text-stroke: 1px black; font-weight: bold;")
+                console.log("%c" + "Hi! If you are reading this from a console, don't put anything in, unless you know what the code you're putting is!", "font-size: 150%;")
+                console.log("%c" + "If you're here to mod the application, have fun! But be careful on what type of mod it is! You may be at risk of losing data!", "font-style: italic;")
+                console.log("Thank you for visiting my website!");
+            } /*else if (lang == "de") {
+                console.log("%c" + "Wichtig!!!", "color: #ff3300; font-size: 300%; -webkit-text-stroke: 1px black; font-weight: bold;")
+                console.log("%c" + "Hi! If you are reading this from a console, don't put anything in, unless you know what the code you're putting is!", "font-size: 150%;")
+                console.log("%c" + "Wenn du dieses App modifizieren möchte, dann viel Spaß!", "font-style: italic;")
+                console.log("Danke, dass du meine Website besucht hast!");
+            }*/
+        }
+
+        printWarning("en")
     </script>
 
     <script src="scripts/widgets.js"></script>
+    <script src="scripts/animation.js"></script>
     <!-- <div id="bottom-bar"></div> -->
     <!-- <button id="play-button">Play</button> -->
     <!-- <script src="scripts/index.js"></script> -->
