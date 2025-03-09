@@ -1,0 +1,13 @@
+{
+    "code": "fr",
+    
+    "menu_file": "Fichier",
+    "menu_edit": "Edition",
+    "menu_select": "Sélection",
+    "menu_insert": "Insérer",
+    "menu_view": "Affichage",
+    "menu_window": "Fenêtre",
+    "menu_help": "Aide",
+    
+    "widget_properties": "Propriétés"
+}

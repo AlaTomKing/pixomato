@@ -1,3 +1,13 @@
 {
+    "code": "de",
+    
+    "menu_file": "Datei",
+    "menu_edit": "Bearbeiten",
+    "menu_select": "Auswahl",
+    "menu_insert": "Einfügen",
+    "menu_view": "Ansicht",
+    "menu_window": "Fenster",
+    "menu_help": "Hilfe",
+
     "widget-properties": "Eigenschaften"
 }

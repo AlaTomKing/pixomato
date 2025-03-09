@@ -1,3 +1,13 @@
 {
-    "widget-properties": "Properties"
+    "code": "en-us",
+    
+    "menu_file": "File",
+    "menu_edit": "Edit",
+    "menu_select": "Select",
+    "menu_insert": "Insert",
+    "menu_view": "View",
+    "menu_window": "Window",
+    "menu_help": "Help",
+    
+    "widget_properties": "Properties"
 }
