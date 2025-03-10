@@ -1,5 +1,5 @@
 {
-    "code": "en",
+    "code": "es",
     
     "menu_file": "File",
     "menu_edit": "Edit",
@@ -9,6 +9,5 @@
     "menu_window": "Window",
     "menu_help": "Help",
     
-    "widget_properties": "Properties",
-    "widget_timeline": "Timeline"
+    "widget_properties": "Properties"
 }
