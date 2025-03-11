@@ -315,22 +315,37 @@ dock5.addChild(dock6);
 dock6.addChild(tab2)
 dock6.addChild(tab3)*/
 
-const dock1 = new dock(true);
+const dock1 = new dock(false);
+const dock2 = new dock(true);
+
 const tab1 = new tab();
 const tab2 = new tab();
+const tab3 = new tab();
+const tab4 = new tab();
+
 const canvasWidget = new widget("New Animation");
+const toolsWidget = new widget("Tools");
 const propertiesWidget = new widget("Properties");
+const timelineWidget = new widget("Timeline")
 
 const canvasEl = document.createElement("canvas");
 canvasEl.id = "drawing-canvas";
 
 canvasWidget.element.appendChild(canvasEl);
 
+toolsWidget.element.style.maxWidth = "64px"
+
 tab1.addWidget(canvasWidget)
 tab2.addWidget(propertiesWidget);
+tab3.addWidget(timelineWidget);
+tab4.addWidget(toolsWidget)
 
-dock1.addChild(tab2)
-dock1.addChild(tab1)
+dock2.addChild(tab4)
+dock2.addChild(tab1)
+dock2.addChild(tab2)
+
+dock1.addChild(dock2)
+dock1.addChild(tab3)
 
 mainFrame.appendChild(dock1.element)
 

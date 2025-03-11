@@ -1,5 +1,12 @@
 {
     "code": "de",
+
+    "language_name": {
+        "en": "Englisch (Vereinigte Staaten)",
+        "de": "Deutsch (Deutschland)",
+        "es": "",
+        "fr": ""
+    }, 
     
     "menu_file": "Datei",
     "menu_edit": "Bearbeiten",

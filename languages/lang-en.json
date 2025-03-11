@@ -1,5 +1,12 @@
 {
     "code": "en",
+
+    "language_name": {
+        "en": "English (United States)",
+        "de": "German (Germany)",
+        "es": "Spanish (Spain)",
+        "fr": "French (France)"
+    },
     
     "menu_file": "File",
     "menu_edit": "Edit",
