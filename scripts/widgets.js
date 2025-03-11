@@ -46,15 +46,9 @@ class dock {
         if (this.children.length === 0) {
             this.close();
         } else if (this.children.length === 1) {
-            console.log(this.parent?.isHorizontal, this.isHorizontal)
             if (this.parent?.isHorizontal === !this.isHorizontal) {
-                console.log("delete itself", this.index);
-
                 if (this.children[0].type === "dock" && this.children[0].isHorizontal === this.parent.isHorizontal) {
-                    console.log("delete itself again", this.index);
-
                     for (let i = 0; i < this.children[0].children.length; i++) {
-                        console.log("lol")
                         this.parent.addChildIndex(this.children[0].children[i], this.index + i);
                     }
                 } else {
@@ -71,13 +65,11 @@ class dock {
     }
 
     addChild(child) {
-        console.log(child)
         child.parent = this;
         child.index = this.children.length;
         child.element.style.order = child.index;
         this.children.push(child);
         this.element.appendChild(child.element);
-        console.log("added child")
     }
 
     addChildIndex(child, index) {
@@ -87,11 +79,7 @@ class dock {
         this.children.splice(index, 0, child)
         this.element.appendChild(child.element);
 
-        console.log(this.children)
-
         for (let i = 0; i < this.children.length; i++) {
-            console.log(i)
-            console.log(this.children[i])
             this.children[i].index = i;
             this.children[i].element.style.order = i.toString();
         }
@@ -137,9 +125,7 @@ class tab {
 
         tabItem.addEventListener("mousedown", (e) => {
             if (e.button === 0) {
-                console.log("make this widget active")
                 if (widget.index != this.selectedIndex) {
-                    console.log("change");
                     this.selectedIndex = widget.index
                     this.currentWidget = widget
                     this.makeActive(widget.index);
@@ -172,8 +158,6 @@ class tab {
     }
 
     removeWidget(index) {
-        console.log("before", this.items)
-
         this.content.removeChild(this.items[index].element);
         this.container.removeChild(this.tabItems[index])
 
@@ -192,8 +176,6 @@ class tab {
     
             this.selectedIndex = this.currentWidget.index
         }
-
-        console.log("after", this.items)
     }
 
     makeActive(index) {
@@ -207,7 +189,7 @@ class tab {
 }
 
 class widget {
-    constructor(title, type) {
+    constructor(title) {
         this.title = title;
         this.parent = null;
         this.index = null;
@@ -222,11 +204,12 @@ class widget {
         if (this.parent !== null && this.index !== null) {
             this.parent.removeWidget(this.index)
         } else {
-            console.log("closing widget")
             this.element.remove();
         }
     }
 }
+
+
 
 /*const root = new dock(dockType.window);
 
@@ -256,7 +239,7 @@ root.show();*/
 // dock2.addChild(tab3);
 // dock2.addChild(tab4);
 
-const dock1 = new dock(false);
+/*const dock1 = new dock(false);
 const dock2 = new dock(true);
 const dock3 = new dock(false);
 const dock4 = new dock(true);
@@ -270,6 +253,7 @@ const d = new tab();
 const e = new tab();
 const f = new tab();
 const g = new tab();
+const g1 = new tab();
 const h = new tab();
 
 const tab1 = new tab();
@@ -283,6 +267,7 @@ const dWidget = new widget("d");
 const eWidget = new widget("efef");
 const fWidget = new widget("f");
 const gWidget = new widget("g");
+const g1Widget = new widget("h");
 const hWidget = new widget("BALLLSSIDFIFHIDFHUI");
 const iWidget = new widget("2903ri239");
 
@@ -295,6 +280,7 @@ d.addWidget(dWidget);
 e.addWidget(eWidget);
 f.addWidget(fWidget);
 g.addWidget(gWidget);
+g1.addWidget(g1Widget);
 h.addWidget(hWidget);
 h.addWidget(iWidget);
 h.addWidget(new widget("test"));
@@ -313,6 +299,7 @@ dock2.addChild(a);
 dock2.addChild(dock3);
 dock2.addChild(f);
 dock2.addChild(g);
+dock2.addChild(g1);
 
 dock3.addChild(b);
 dock3.addChild(dock4);
@@ -326,9 +313,24 @@ dock5.addChild(tab1)
 dock5.addChild(dock6);
 
 dock6.addChild(tab2)
-dock6.addChild(tab3)
+dock6.addChild(tab3)*/
 
-h.makeActive(1);
+const dock1 = new dock(true);
+const tab1 = new tab();
+const tab2 = new tab();
+const canvasWidget = new widget("New Animation");
+const propertiesWidget = new widget("Properties");
+
+const canvasEl = document.createElement("canvas");
+canvasEl.id = "drawing-canvas";
+
+canvasWidget.element.appendChild(canvasEl);
+
+tab1.addWidget(canvasWidget)
+tab2.addWidget(propertiesWidget);
+
+dock1.addChild(tab2)
+dock1.addChild(tab1)
 
 mainFrame.appendChild(dock1.element)
 

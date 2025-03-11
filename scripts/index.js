@@ -27,9 +27,9 @@ document.getElementById("menu-github-btn").addEventListener("click", () => {
   window.open("https://github.com/AlaTomKing/pixomato");
 })
 
-const mainFrame = document.getElementById("main-frame");
-const canvasWidget = document.getElementById("canvas-widget");
-const canvasEl = document.getElementById("drawing-canvas");
+//const mainFrame = document.getElementById("main-frame");
+//const canvasWidget = document.getElementById("canvas-widget");
+//const canvasEl = document.getElementById("drawing-canvas");
 const ctx = canvasEl.getContext("2d");
 
 let pixels = {};
@@ -44,8 +44,10 @@ let canvasSizeY = 240;
 let currentPixelX = 1;
 let currentPixelY = 0;
 
-let displayWidth = canvasWidget.offsetWidth;
-let displayHeight = canvasWidget.offsetHeight;
+const rect = canvasEl.parentElement.getBoundingClientRect();
+
+let displayWidth = rect.width;
+let displayHeight = rect.height;
 
 let posX = 0; // 0 is center
 let posY = 0; // 0 is center
@@ -312,10 +314,12 @@ const resize = (e) => {
   //   ctx.scale((devicePixelRatio * res), (devicePixelRatio * res));
   // }
 
+  const rect = canvasEl.parentElement.getBoundingClientRect();
+
   ctx.scale(res, res);
 
-  displayWidth = canvasWidget.offsetWidth;
-  displayHeight = canvasWidget.offsetHeight;
+  displayWidth = rect.width;
+  displayHeight = rect.height;
 
   canvasEl.style.width = displayWidth + "px";
   canvasEl.style.height = displayHeight + "px";
@@ -333,8 +337,10 @@ const changeMousePos = (e) => {
   const oldX = cursorX;
   const oldY = cursorY;
 
-  cursorX = e.clientX - canvasWidget.offsetLeft - mainFrame.offsetLeft;
-  cursorY = e.clientY - canvasWidget.offsetTop - mainFrame.offsetTop;
+  const rect = canvasEl.parentElement.getBoundingClientRect();
+
+  cursorX = e.clientX - rect.left;
+  cursorY = e.clientY - rect.top;
 
   mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) &&
     cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
@@ -450,27 +456,27 @@ const mouseup = (e) => {
 
 //window.onresize(resize)
 
-//window.addEventListener("load", () => {
-if (ctx) {
-  ctx.imageSmoothingEnabled = false;
+window.addEventListener("load", () => {
+  if (ctx) {
+    ctx.imageSmoothingEnabled = false;
 
-  window.addEventListener("resize", resize);
-  window.addEventListener("mouseout", mouseout);
+    window.addEventListener("resize", resize);
+    window.addEventListener("mouseout", mouseout);
 
-  document.addEventListener("mousedown", mousedown);
-  document.addEventListener("mouseup", mouseup);
+    document.addEventListener("mousedown", mousedown);
+    document.addEventListener("mouseup", mouseup);
 
-  document.addEventListener("mousemove", changeMousePos);
-  document.addEventListener("wheel", wheel, { passive: false });
-  document.addEventListener("touchmove", touch, { passive: false });
+    document.addEventListener("mousemove", changeMousePos);
+    document.addEventListener("wheel", wheel, { passive: false });
+    document.addEventListener("touchmove", touch, { passive: false });
 
-  image.addEventListener("load", render)
+    image.addEventListener("load", render)
 
-  render();
-  resize();
-}
+    render();
+    resize();
+  }
 
-/*if ("serviceWorker" in navigator && document.URL.split(":")[0] !== "file") {
-  navigator.serviceWorker.register("./sw.js");
-}*/
-//});
+  /*if ("serviceWorker" in navigator && document.URL.split(":")[0] !== "file") {
+    navigator.serviceWorker.register("./sw.js");
+  }*/
+});
