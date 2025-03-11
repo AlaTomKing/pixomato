@@ -285,6 +285,11 @@ button:hover:active {
     margin-top: calc(var(--stroke-size) + var(--widget-gap));
 }
 
+#drawing-canvas {
+    position: relative;
+    /* outline: var(--stroke-size) solid var(--stroke-color); */
+}
+
 /*#canvas-widget {
     background-color: rgb(255,255,255,0);
 
