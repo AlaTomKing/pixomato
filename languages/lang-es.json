@@ -1,5 +1,10 @@
 {
     "code": "es",
+
+    "language_name": {
+        "de": "Deutsch (Deutschland)",
+        "es": "Español (España)"
+    },
     
     "menu_file": "File",
     "menu_edit": "Edit",
