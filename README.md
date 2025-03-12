@@ -20,6 +20,7 @@ Since Pixomato is made to be extremely versatile and to be supported on roughly 
 - Nintendo Wii U
 - Xbox
 - PlayStation
+
 But then I have to really optimize the web browser. I'm not really sure if some web browsers supports flexbox.
 
 ## Help
