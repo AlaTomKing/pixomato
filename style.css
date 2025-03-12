@@ -273,7 +273,7 @@ button:hover:active {
     width: 100%;
 }
 
-#main-frame {
+#main-frame, #resize-frame {
     position: absolute;
 
     top: 32px;
@@ -285,7 +285,14 @@ button:hover:active {
     margin-top: calc(var(--stroke-size) + var(--widget-gap));
 }
 
+#resize-frame {
+    pointer-events:none;
+}
+
 #drawing-canvas {
+    background-color: var(--background-color);
+    
+    outline: var(--stroke-size) solid var(--stroke-color);
     position: relative;
     /* outline: var(--stroke-size) solid var(--stroke-color); */
 }
