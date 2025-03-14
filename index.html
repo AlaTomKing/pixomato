@@ -42,51 +42,52 @@
     <meta property="og:image:alt" content="Use Pixomato now!">
 
     <noscript>
-    <style>
-        #pixomato {
-            display: none
-        }
+        <style>
+            #pixomato {
+                display: none
+            }
 
-        #no-js {
-            display: flex;
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            flex-direction: column;
-        }
+            #no-js {
+                display: flex;
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                flex-direction: column;
+            }
 
-        #no-js > #no-js-image {
-            width: 64px;
-            height: 64px;
+            #no-js>#no-js-image {
+                width: 64px;
+                height: 64px;
 
-            background: url("./resources/logo_sad.png") 0px 0px;
-            background-size: cover;
-        }
+                background: url("./resources/logo_sad.png") 0px 0px;
+                background-size: cover;
+            }
 
-        #no-js > #no-js-image:hover, #no-js-image:active {
-            background: url("./resources/logo_sad.png") 64px 0px;
-            background-size: cover;
-        }
-    </style>
+            #no-js>#no-js-image:hover,
+            #no-js-image:active {
+                background: url("./resources/logo_sad.png") 64px 0px;
+                background-size: cover;
+            }
+        </style>
     </noscript>
 </head>
 
 <body>
     <noscript>
-    <span id="no-js">
-        <div id="no-js-image"></div>
-        <br>
-        Hi! I noticed you have JavaScript disabled!<br>
-        Unfortunately, Pixomato runs on JavaScript so you can't use<br>
-        the app without having JavaScript turned on.<br>
-        <br>
-        Thank you for visiting though!
-        <br><br>
-        <span style="color: #3765ad; font-weight: bold;">Please turn on JavaScript to use Pixomato.</span>
-    </span>
+        <span id="no-js">
+            <div id="no-js-image"></div>
+            <br>
+            Hi! I noticed you have JavaScript disabled!<br>
+            Unfortunately, Pixomato runs on JavaScript so you can't use<br>
+            the app without having JavaScript turned on.<br>
+            <br>
+            Thank you for visiting though!
+            <br><br>
+            <span style="color: #3765ad; font-weight: bold;">Please turn on JavaScript to use Pixomato.</span>
+        </span>
     </noscript>
 
     <div id="pixomato" style="height: 100%; width: 100%;">
@@ -129,7 +130,7 @@
         </div>
 
         <div id="resize-frame">
-            
+
         </div>
     </div>
 
@@ -149,6 +150,46 @@
         }
 
         printWarning("en")
+
+        function memorySizeOf(obj) {
+            var bytes = 0;
+
+            function sizeOf(obj) {
+                if (obj !== null && obj !== undefined) {
+                    switch (typeof obj) {
+                        case "number":
+                            bytes += 8;
+                            break;
+                        case "string":
+                            bytes += obj.length * 2;
+                            break;
+                        case "boolean":
+                            bytes += 4;
+                            break;
+                        case "object":
+                            var objClass = Object.prototype.toString.call(obj).slice(8, -1);
+                            if (objClass === "Object" || objClass === "Array") {
+                                for (var key in obj) {
+                                    if (!obj.hasOwnProperty(key)) continue;
+                                    sizeOf(obj[key]);
+                                }
+                            } else bytes += obj.toString().length * 2;
+                            break;
+                    }
+                }
+                return bytes;
+            }
+
+            function formatByteSize(bytes) {
+                return bytes + " bytes";
+                /*if (bytes < 1024) return bytes + " bytes";
+                else if (bytes < 1048576) return (bytes / 1024).toFixed(3) + " KiB";
+                else if (bytes < 1073741824) return (bytes / 1048576).toFixed(3) + " MiB";
+                else return (bytes / 1073741824).toFixed(3) + " GiB";*/
+            }
+
+            return formatByteSize(sizeOf(obj));
+        }
     </script>
 
     <!-- <script src="scripts/ctx_menu.js"></script> -->

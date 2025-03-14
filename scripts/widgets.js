@@ -87,7 +87,7 @@ class dock {
 };
 
 class tab {
-    constructor() {
+    constructor(size) {
         this.type = "tab";
 
         const element = document.createElement("div");
@@ -100,6 +100,9 @@ class tab {
 
         element.appendChild(container)
         element.appendChild(content)
+
+        element.style.width = size?.x || "none";
+        element.style.height = size?.y || "none";
 
         this.parent = null;
         this.index = null;
@@ -123,7 +126,6 @@ class tab {
         tabItem.innerHTML = widget.title;
 
         tabItem.addEventListener("mousedown", (e) => {
-            console.log("a")
             if (e.button === 0) {
                 if (widget.index != this.selectedIndex) {
                     this.selectedIndex = widget.index
@@ -190,8 +192,6 @@ class tab {
 
         const widget = this.items[index]
 
-        console.log(widget.size)
-
         this.element.style.minWidth = widget.size.xMin;
         this.element.style.maxWidth = widget.size.xMax;
         this.element.style.minHeight = widget.size.yMin;
@@ -232,14 +232,14 @@ const dock1 = new dock(false);
 const dock2 = new dock(true);
 
 const tab1 = new tab();
-const tab2 = new tab();
+const tab2 = new tab({x:"312px"});
 const tab3 = new tab();
 const tab4 = new tab();
 
 const canvasWidget = new widget("New Animation");
 const toolsWidget = new widget("Tools", {xMax: "128px"});
 const propertiesWidget = new widget("Properties", {xMax: "312px"});
-const layersWidget = new widget("Layer");
+const layerWidget = new widget("Layer");
 const timelineWidget = new widget("Timeline", {yMax: "296px"});
 
 const canvasEl = document.createElement("canvas");
@@ -251,7 +251,7 @@ toolsWidget.element.style.maxWidth = "64px"
 
 tab1.addWidget(canvasWidget)
 tab2.addWidget(propertiesWidget);
-tab4.addWidget(layersWidget);
+tab2.addWidget(layerWidget);
 tab3.addWidget(timelineWidget);
 tab4.addWidget(toolsWidget)
 
