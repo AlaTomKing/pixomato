@@ -2,6 +2,8 @@
 
 let zoom; // 1: 100%
 
+let hasZoomed = false;
+
 const black = (text) => (`\x1b[30m${text}`)
 const red = (text) => (`\x1b[31m${text}`)
 const green = (text) => (`\x1b[32m${text}`)
@@ -38,10 +40,10 @@ const rectSize = 10;
 
 let cursorX, cursorY = 0;
 
-let canvasSizeX = 360;
-let canvasSizeY = 240;
+let canvasSizeX = 36;
+let canvasSizeY = 24;
 
-let currentPixelX = 1;
+let currentPixelX = 0;
 let currentPixelY = 0;
 
 const rect = canvasEl.parentElement.getBoundingClientRect();
@@ -128,31 +130,49 @@ const render = () => {
 
   // MAIN FRAME
   //ctx.globalAlpha = 0.4
+  const canvasPosX = Math.floor(((displayWidth / 2) - (canvasSizeX * zoom / 2) - posX) * res) / res
+  const canvasPosY = Math.floor(((displayHeight / 2) - (canvasSizeY * zoom / 2) - posY) * res) / res
+  const canvasWidth = Math.floor((canvasSizeX * zoom) * res) / res
+  const canvasHeight = Math.floor((canvasSizeY * zoom) * res) / res
+
   setRGBFill(255, 255, 255, 1);
   fillRect(
-    ((displayWidth / 2) - (canvasSizeX * zoom / 2) - posX),
-    ((displayHeight / 2) - (canvasSizeY * zoom / 2) - posY),
-    (canvasSizeX * zoom),
-    (canvasSizeY * zoom));
+    canvasPosX,
+    canvasPosY,
+    canvasWidth,
+    canvasHeight
+  );
+
+  console.log(canvasPosX, canvasPosY, canvasWidth, canvasHeight)
   //ctx.globalAlpha = 1
+
+  ctx.shadowColor = "transparent"
 
   for (const [key, value] of Object.entries(pixels)) {
     let [pixelX, pixelY] = key.split(":");
+    pixelX = Number(pixelX);
+    pixelY = Number(pixelY);
 
     //const cellSize = canvasEl.width / canvasSizeX
 
     setRGBFill(0, 0, 0, 1);
     fillRect(
-      ((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX + pixelX * zoom),
-      ((displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY + pixelY * zoom),
-      (zoom),
-      (zoom)
+      canvasPosX + Math.floor(pixelX * zoom * res) / res,
+      canvasPosY + Math.floor(pixelY * zoom * res) / res,
+      (canvasPosX + Math.floor((pixelX+1) * zoom * res) / res) - (canvasPosX + Math.floor(pixelX * zoom * res) / res),
+      (canvasPosY + Math.floor((pixelY+1) * zoom * res) / res) - (canvasPosY + Math.floor(pixelY * zoom * res) / res)
     )
+    /*fillRect(
+      Math.round(Math.round((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX) + (pixelX * (zoom))),
+      Math.round(Math.round((displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY) + (pixelY * (zoom))),
+      Math.round(zoom),
+      Math.round(zoom)
+    )*/
   }
 
   if (mouseInFrame) {
     setRGBFill(0, 0, 0, 1);
-    strokeRect((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX + currentPixelX * zoom, (displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY + currentPixelY * zoom, Math.ceil(zoom), Math.ceil(zoom))
+    strokeRect((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX + currentPixelX * zoom, (displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY + currentPixelY * zoom, zoom, zoom)
   }
 
   /*if (showGrid) {
@@ -327,6 +347,54 @@ const resize = (e) => {
   canvasEl.width = displayWidth * res;
   canvasEl.height = displayHeight * res;
 
+  if (!hasZoomed) {
+    const oldZoom = zoom;
+    //zoom = (Math.floor((2 ** i)  * 100) / 100).clamp(0.01, 100)
+    if (canvasSizeX / canvasSizeY > displayWidth / displayHeight) {
+      zoom = ((displayWidth) / (canvasSizeX * 1.2)).clamp(0.01, 100)
+    } else {
+      zoom = ((displayHeight) / (canvasSizeY * 1.2)).clamp(0.01, 100)
+    }
+
+    showGrid = (zoom >= 5)
+
+    if (zoom - oldZoom !== 0) {
+      const rect = canvasEl.parentElement.getBoundingClientRect();
+
+      const x = rect.width / 2
+      const y = rect.height / 2
+
+      const midX = displayWidth / 2 - (posX);
+      const midY = displayHeight / 2 - (posY);
+
+      const cursorXFrame = (x).clamp(midX - (canvasSizeX * oldZoom) / 2, midX + (canvasSizeX * oldZoom) / 2)
+      const cursorYFrame = (y).clamp(midY - (canvasSizeY * oldZoom) / 2, midY + (canvasSizeY * oldZoom) / 2)
+
+      const cursorMidX = cursorXFrame - midX;
+      const cursorMidY = cursorYFrame - midY;
+
+      const zoomDelta = (zoom - oldZoom)
+
+      const zoomDiffX = cursorMidX / oldZoom * zoomDelta;
+      const zoomDiffY = cursorMidY / oldZoom * zoomDelta;
+
+      posX += zoomDiffX;
+      posY += zoomDiffY;
+    }
+
+    if ((canvasSizeX * zoom) < displayWidth) {
+      posX = (posX.clamp(-displayWidth / 2, displayWidth / 2));
+    } else {
+      posX = (posX.clamp(-canvasSizeX * zoom / 2, canvasSizeX * zoom / 2));
+    }
+  
+    if ((canvasSizeY * zoom) < displayHeight) {
+      posY = (posY.clamp(-displayHeight / 2, displayHeight / 2));
+    } else {
+      posY = (posY.clamp(-canvasSizeY * zoom / 2, canvasSizeY * zoom / 2))
+    }
+  }
+
   render();
 }
 
@@ -371,7 +439,8 @@ const wheel = (e) => {
       const i = Math.log2(zoom) - e.deltaY * 0.025; //0.0025;
       //zoom = (Math.floor((2 ** i)  * 100) / 100).clamp(0.01, 100)
       zoom = (2 ** i).clamp(0.01, 100)
-      console.log(Math.floor(zoom * 100));
+
+      hasZoomed = true;
 
       showGrid = (zoom >= 5)
 
@@ -471,6 +540,12 @@ window.addEventListener("load", () => {
     document.addEventListener("touchmove", touch, { passive: false });
 
     image.addEventListener("load", render)
+
+    /*for (let i = 0; i < canvasSizeX; i++) {
+      for (let j = 0; j < canvasSizeY; j++) {
+        pixels[i+":"+j] = true
+      }
+    }*/
 
     render();
     resize();
