@@ -1,10 +1,10 @@
-# Pixomato: (Pixelated) HTML Animator
+# Pixomato
 
 Since I developed an artstyle (which I regret) of drawing pixelated cartoon characters, I have decided to develop an animator that helps me draw pixelated characters, but with mobility.
 
-Pixomato is a website where I can create pixelated animations (and maybe vector if you crank the resolution high).
+Pixomato is a website written in HTML, CSS and JavaScript where I can create pixelated animations (and maybe "vector" if you crank the resolution high).
 
-Pixomato is slightly related to PixotatoJS.
+Pixomato is slightly related to PixotatoJS, which is one of my old modules I forgot it existed which draws, you guessed it, pixels.
 
 ## Supported Browsers
 I haven't done some research but first you need a decent computer or tablet. You could try either a fast supercomputer or 2000s PC.
@@ -21,7 +21,7 @@ Since Pixomato is made to be extremely versatile and to be supported on roughly 
 - Xbox
 - PlayStation
 
-But then I have to really optimize the web browser. I'm not really sure if some web browsers supports flexbox.
+But then I have to really optimize the web browser. I'm not really sure if some web browsers supports Flexbox.
 
 ## Help
 Try really hard to break my website and when you manage to break my website, please report it in the [issues](https://github.com/AlaTomKing/pixomato/issues).
