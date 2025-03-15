@@ -1,6 +1,6 @@
 // test animation
 
-let FPS = 12;
+let FPS = 24;
 
 const max = 5000;
 
@@ -10,8 +10,6 @@ let startTime
 let runnin = false
 
 let then, fpsInterval, timeStopped
-
-console.log("fps")
 
 const frame = () => {
     const now = performance.now();
@@ -34,6 +32,8 @@ const frame = () => {
 // function that will print out frames in 5 seconds
 const testFrames = () => {
     console.log("start")
+
+    console.log("fps", FPS)
 
     runnin = true
 
