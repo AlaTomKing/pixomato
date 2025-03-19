@@ -508,19 +508,23 @@ const mouseout = (e) => {
 };
 
 const mousedown = (e) => {
-  mouseDown = true;
+  if (e.button === 0) {
+    mouseDown = true;
 
-  //if (mouseInCanvas) {
-  if (mouseInFrame) {
-    drawPixel();
+    //if (mouseInCanvas) {
+    if (mouseInFrame) {
+      drawPixel();
+    }
+    //}
+
+    render();
   }
-  //}
-
-  render();
 }
 
 const mouseup = (e) => {
-  mouseDown = false;
+  if (e.button === 0) {
+    mouseDown = false;
+  }
 }
 
 //window.onresize(resize)
@@ -532,10 +536,10 @@ window.addEventListener("load", () => {
     window.addEventListener("resize", resize);
     window.addEventListener("mouseout", mouseout);
 
-    document.addEventListener("mousedown", mousedown);
-    document.addEventListener("mouseup", mouseup);
+    document.addEventListener("pointerdown", mousedown);
+    document.addEventListener("pointerup", mouseup);
 
-    document.addEventListener("mousemove", changeMousePos);
+    document.addEventListener("pointermove", changeMousePos);
     document.addEventListener("wheel", wheel, { passive: false });
     document.addEventListener("touchmove", touch, { passive: false });
 

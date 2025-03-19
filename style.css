@@ -297,6 +297,27 @@ button:hover:active {
     /* outline: var(--stroke-size) solid var(--stroke-color); */
 }
 
+#context-menu-frame {
+    position: absolute;
+    display: none;
+
+    background-color: rgba(0,0,0,0);
+
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+
+.context-menu {
+    position: absolute;
+
+    height: 100px;
+    width: 100px;
+
+    background-color: blue;
+}
+
 /*#canvas-widget {
     background-color: rgb(255,255,255,0);
 
