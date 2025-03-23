@@ -22,7 +22,8 @@ document.addEventListener("mousedown", (e) => {
 
     if (!((e.clientX >= rect.left && e.clientX <= rect.left + rect.width) && (e.clientY >= rect.top && e.clientY <= rect.top + rect.height))) {
         ctxFrameEl.style.display = "none";
-        ctxMenuEl.style.display = "none";
+        //ctxMenuEl.style.display = "none";
+        ctxMenuEl.style.animation = "none";
     }
 
 });
@@ -34,7 +35,9 @@ document.addEventListener("mouseup", (e) => {
         console.log("context menu");
 
         ctxFrameEl.style.display = "block";
-        ctxMenuEl.style.display = "block";
+        //ctxMenuEl.style.display = "block";
+
+        ctxMenuEl.style.animation = null;
 
         const rect = ctxMenuEl.getBoundingClientRect();
 
@@ -57,10 +60,12 @@ document.addEventListener("mouseup", (e) => {
 window.addEventListener("blur", (e) => {
     console.log("windows blur")
     ctxFrameEl.style.display = "none";
-    ctxMenuEl.style.display = "none";
+    //ctxMenuEl.style.display = "none";
+    ctxMenuEl.style.animation = "none";
 });
 
 window.addEventListener("resize", (e) => {
     ctxFrameEl.style.display = "none";
-    ctxMenuEl.style.display = "none";
+    // ctxMenuEl.style.display = "none";
+    ctxMenuEl.style.animation = "none";
 })
