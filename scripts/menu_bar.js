@@ -6,7 +6,38 @@ menuContainer.className = "menu-container"
 
 const menuList = []
 
+const menus = {
+    file: [
+        {
+            type: "tree",
+            label: "New",
+            list: [
+                {
+                    type: "button",
+                    label: "Animation"
+                },
+            ]
+        }
+    ],
+    help: [
+        {
+            type: "button",
+            label: "Go to GitHub",
+        },
+        {
+            type: "separator",
+        },
+        {
+            type: "button",
+            label: "Documentation",
+            shortcut: "F2",
+        }
+    ]
+}
+
 let menuActive = false
+let menuHover = false
+let menuDebounce = false;
 let currentElementHover
 
 const createMenuBtn = (name) => {
@@ -20,20 +51,29 @@ const createMenuBtn = (name) => {
 
     let makeActive = addContextMenuBar(btn, label);
 
-    btn.addEventListener("click", () => {
-        btn.className = "menu-tab-btn-selected";
-        console.log(name + " btn pressed")
-        currentElementHover = btn
+    btn.addEventListener("mousedown", (e) => {
+        if (e.button === 0 && !ctxMenuBarOpen) {
+            btn.className = "menu-tab-btn-selected";
+            currentElementHover = btn
+            menuDebounce = true;
+            makeActive();
+        }
+    })
+
+    btn.addEventListener("mouseup", (e) => {
+        if (e.button === 0 && ctxMenuBarOpen) {
+            if (menuDebounce === false)
+                closeCtxMenu();
+            menuDebounce = false;
+        }
     })
 
     btn.addEventListener("mouseover", () => {
-        console.log("mouse over");
         if (ctxMenuBarOpen && currentElementHover) {
             currentElementHover.className = "menu-tab-btn";
             btn.className = "menu-tab-btn-selected";
-            console.log("change");
-            makeActive();
             currentElementHover = btn
+            makeActive();
         }
     })
 
@@ -50,6 +90,14 @@ const insertBtn = createMenuBtn("Insert")
 const viewBtn = createMenuBtn("View")
 const windowBtn = createMenuBtn("Window")
 const helpBtn = createMenuBtn("Help")
+
+menuContainer.addEventListener("mouseover", () => {
+    menuHover = true;
+})
+
+menuContainer.addEventListener("mouseout", () => {
+    menuHover = false;
+})
 
 // const fileBtn = document.getElementById("menu-tab-btn");
 

@@ -1,10 +1,10 @@
 {
     "code": "fr",
 
-    "language_name": {
-        "de": "Allemand (Allemagne)",
-        "fr": "Français (France)"
-    },
+    "lang_name_en": "",
+    "lang_name_de": "Allemand (Allemagne)",
+    "lang_name_es": "",
+    "lang_name_fr": "Français (France)",
     
     "menu_file": "Fichier",
     "menu_edit": "Edition",

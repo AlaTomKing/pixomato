@@ -1,10 +1,10 @@
 {
     "code": "es",
 
-    "language_name": {
-        "de": "Deutsch (Deutschland)",
-        "es": "Español (España)"
-    },
+    "lang_name_en": "",
+    "lang_name_de": "",
+    "lang_name_es": "Español (España)",
+    "lang_name_fr": "",
     
     "menu_file": "File",
     "menu_edit": "Edit",
