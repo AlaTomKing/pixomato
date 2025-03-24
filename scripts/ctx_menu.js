@@ -10,9 +10,39 @@ const ctxOffsetY = 1
 
 let ctxMenuBarOpen = false;
 
+const closeCtxMenu = () => {
+    ctxFrameEl.style.display = "none";
+    //ctxMenuEl.style.display = "none";
+    ctxMenuEl.style.animation = "none";
+    ctxMenuBarOpen = false;
+    if (currentElementHover) {
+        currentElementHover.className = "menu-tab-btn";
+    }
+}
+
+// class ctxMenuBar {
+//     constructor(element, label) {
+//         const rect = label.getBoundingClientRect();
+
+//         const posX = rect.left;
+//         const posY = rect.top + rect.height;
+
+//         ctxFrameEl.style.display = "block";
+//         ctxFrameEl.style.pointerEvents = "none";
+
+//         ctxMenuEl.style.left = posX + "px";
+//         ctxMenuEl.style.top = posY + "px";
+
+//         ctxMenuBarOpen = true;
+//     }
+
+//     makeActive() {
+    
+//     }
+// }
+
 const addContextMenuBar = (element, label) => {
     const makeActive = () => {
-        console.log("clicked");
         const rect = label.getBoundingClientRect();
 
         const posX = rect.left;
@@ -27,7 +57,7 @@ const addContextMenuBar = (element, label) => {
         ctxMenuBarOpen = true;
     }
 
-    element.addEventListener("click", (e) => { makeActive() })
+    // element.addEventListener("click", (e) => { makeActive() })
 
     return makeActive;
 }
@@ -41,25 +71,17 @@ document.addEventListener("contextmenu", (e) => {
 });
 
 document.addEventListener("mousedown", (e) => {
+    if (!menuHover) {
+        const rect = ctxMenuEl.getBoundingClientRect();
 
-    const rect = ctxMenuEl.getBoundingClientRect();
-
-    if (!((e.clientX >= rect.left && e.clientX <= rect.left + rect.width) && (e.clientY >= rect.top && e.clientY <= rect.top + rect.height))) {
-        ctxFrameEl.style.display = "none";
-        //ctxMenuEl.style.display = "none";
-        ctxMenuEl.style.animation = "none";
-        ctxMenuBarOpen = false;
-        currentElementHover.className = "menu-tab-btn";
+        if (!((e.clientX >= rect.left && e.clientX <= rect.left + rect.width) && (e.clientY >= rect.top && e.clientY <= rect.top + rect.height))) {
+            closeCtxMenu();
+        }
     }
-
 });
 
 document.addEventListener("mouseup", (e) => {
     if (e.button === 2) {
-        console.log(e.clientX, e.clientY);
-
-        console.log("context menu");
-
         ctxFrameEl.style.display = "block";
         ctxFrameEl.style.pointerEvents = null;
         //ctxMenuEl.style.display = "block";
@@ -85,18 +107,9 @@ document.addEventListener("mouseup", (e) => {
 })
 
 window.addEventListener("blur", (e) => {
-    console.log("windows blur")
-    ctxFrameEl.style.display = "none";
-    //ctxMenuEl.style.display = "none";
-    ctxMenuEl.style.animation = "none";
-    ctxMenuBarOpen = false;
-    currentElementHover.className = "menu-tab-btn";
+    closeCtxMenu()
 });
 
 window.addEventListener("resize", (e) => {
-    ctxFrameEl.style.display = "none";
-    // ctxMenuEl.style.display = "none";
-    ctxMenuEl.style.animation = "none";
-    ctxMenuBarOpen = false;
-    currentElementHover.className = "menu-tab-btn";
+    closeCtxMenu()
 })

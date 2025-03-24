@@ -1,12 +1,10 @@
 {
     "code": "de",
-
-    "language_name": {
-        "en": "Englisch (Vereinigte Staaten)",
-        "de": "Deutsch (Deutschland)",
-        "es": "",
-        "fr": ""
-    }, 
+    
+    "lang_name_en": "Englisch (Vereinigte Staaten)",
+    "lang_name_de": "Deutsch (Deutschland)",
+    "lang_name_es": "Spanisch (Spanien)",
+    "lang_name_fr": "Französisch (Frankreich)",
     
     "menu_file": "Datei",
     "menu_edit": "Bearbeiten",
@@ -15,6 +13,11 @@
     "menu_view": "Ansicht",
     "menu_window": "Fenster",
     "menu_help": "Hilfe",
+
+    "menu_file_new": "Neue Datei",
+    "menu_file_new_animation": "Animation",
+
+    "menu_help_documentation": "Dokumentation",
 
     "widget-properties": "Eigenschaften",
     "widget_timeline": "Zeitleiste"
