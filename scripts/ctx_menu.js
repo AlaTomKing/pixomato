@@ -8,6 +8,30 @@ const ctxMenuEl = document.getElementById("context-menu")
 const ctxOffsetX = 1
 const ctxOffsetY = 1
 
+let ctxMenuBarOpen = false;
+
+const addContextMenuBar = (element, label) => {
+    const makeActive = () => {
+        console.log("clicked");
+        const rect = label.getBoundingClientRect();
+
+        const posX = rect.left;
+        const posY = rect.top + rect.height;
+
+        ctxFrameEl.style.display = "block";
+        ctxFrameEl.style.pointerEvents = "none";
+
+        ctxMenuEl.style.left = posX + "px";
+        ctxMenuEl.style.top = posY + "px";
+
+        ctxMenuBarOpen = true;
+    }
+
+    element.addEventListener("click", (e) => { makeActive() })
+
+    return makeActive;
+}
+
 const addContextMenu = () => {
 
 }
@@ -24,6 +48,8 @@ document.addEventListener("mousedown", (e) => {
         ctxFrameEl.style.display = "none";
         //ctxMenuEl.style.display = "none";
         ctxMenuEl.style.animation = "none";
+        ctxMenuBarOpen = false;
+        currentElementHover.className = "menu-tab-btn";
     }
 
 });
@@ -35,6 +61,7 @@ document.addEventListener("mouseup", (e) => {
         console.log("context menu");
 
         ctxFrameEl.style.display = "block";
+        ctxFrameEl.style.pointerEvents = null;
         //ctxMenuEl.style.display = "block";
 
         ctxMenuEl.style.animation = null;
@@ -62,10 +89,14 @@ window.addEventListener("blur", (e) => {
     ctxFrameEl.style.display = "none";
     //ctxMenuEl.style.display = "none";
     ctxMenuEl.style.animation = "none";
+    ctxMenuBarOpen = false;
+    currentElementHover.className = "menu-tab-btn";
 });
 
 window.addEventListener("resize", (e) => {
     ctxFrameEl.style.display = "none";
     // ctxMenuEl.style.display = "none";
     ctxMenuEl.style.animation = "none";
+    ctxMenuBarOpen = false;
+    currentElementHover.className = "menu-tab-btn";
 })

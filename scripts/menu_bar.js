@@ -4,6 +4,11 @@ const topBar = document.getElementById("top-bar")
 const menuContainer = document.createElement("div")
 menuContainer.className = "menu-container"
 
+const menuList = []
+
+let menuActive = false
+let currentElementHover
+
 const createMenuBtn = (name) => {
     const btn = document.createElement("div");
     btn.className = "menu-tab-btn";
@@ -13,12 +18,29 @@ const createMenuBtn = (name) => {
     label.className = "menu-btn-label";
     label.innerHTML = name
 
+    let makeActive = addContextMenuBar(btn, label);
+
     btn.addEventListener("click", () => {
+        btn.className = "menu-tab-btn-selected";
         console.log(name + " btn pressed")
+        currentElementHover = btn
+    })
+
+    btn.addEventListener("mouseover", () => {
+        console.log("mouse over");
+        if (ctxMenuBarOpen && currentElementHover) {
+            currentElementHover.className = "menu-tab-btn";
+            btn.className = "menu-tab-btn-selected";
+            console.log("change");
+            makeActive();
+            currentElementHover = btn
+        }
     })
 
     btn.appendChild(label);
     menuContainer.appendChild(btn);
+
+    menuList.push(btn);
 }
 
 const fileBtn = createMenuBtn("File")

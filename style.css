@@ -140,7 +140,7 @@ button:hover:active {
     bottom: 4px;
 }
 
-#top-bar > .menu-container > .menu-tab-btn {
+#top-bar > .menu-container > .menu-tab-btn, .menu-tab-btn-selected {
     display: flex;
     align-items: center;
     background-color: rgba(0,0,0,0);
@@ -151,7 +151,7 @@ button:hover:active {
     padding-bottom: 0px;
 }
 
-#top-bar > .menu-container > .menu-tab-btn > .menu-btn-label {
+#top-bar > .menu-container .menu-btn-label {
     background-color: rgba(0,0,0,0);
     border-radius: 5px;
 
@@ -170,6 +170,12 @@ button:hover:active {
 
 #top-bar > .menu-container > .menu-tab-btn:hover > .menu-btn-label {
     background-color: var(--topbar-btn-hover-color);
+}
+
+#top-bar > .menu-container > .menu-tab-btn-selected > .menu-btn-label {
+    background-color: var(--topbar-btn-hover-color);
+    outline: solid var(--stroke-color) var(--stroke-size);
+    outline-offset: calc(-1 * var(--stroke-size));
 }
 
 #bottom-bar {
@@ -304,7 +310,7 @@ button:hover:active {
 #drawing-canvas {
     background-color: var(--background-color);
     
-    outline: var(--stroke-size) solid var(--stroke-color);
+    outline: solid var(--stroke-size) var(--stroke-color);
     position: relative;
     /* outline: var(--stroke-size) solid var(--stroke-color); */
 }
@@ -332,7 +338,7 @@ button:hover:active {
     opacity: 1;
     animation: fade-in 0.15s;
 
-    box-shadow: 0px 0px 0px 0.4px #000000, 0px 4px 10px 0px rgba(0, 0, 0, 0.25);
+    /* box-shadow: 0px 0px 0px 0.4px #000000, 0px 4px 10px 0px rgba(0, 0, 0, 0.25); */
 
     border-radius: 5px;
 }
