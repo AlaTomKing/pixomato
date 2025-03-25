@@ -77,6 +77,7 @@ document.addEventListener("mousedown", (e) => {
         if (!((e.clientX >= rect.left && e.clientX <= rect.left + rect.width) && (e.clientY >= rect.top && e.clientY <= rect.top + rect.height))) {
             closeCtxMenu();
         }
+        
     }
 });
 
