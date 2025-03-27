@@ -25,9 +25,9 @@ Number.prototype.clamp = function (min, max) {
   return Math.min(Math.max(this, min), max);
 };
 
-document.getElementById("menu-github-btn").addEventListener("click", () => {
-  window.open("https://github.com/AlaTomKing/pixomato");
-})
+// document.getElementById("menu-github-btn").addEventListener("click", () => {
+//   window.open("https://github.com/AlaTomKing/pixomato");
+// })
 
 //const mainFrame = document.getElementById("main-frame");
 //const canvasWidget = document.getElementById("canvas-widget");
