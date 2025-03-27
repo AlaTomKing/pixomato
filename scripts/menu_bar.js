@@ -6,7 +6,7 @@ menuContainer.className = "menu-container"
 
 const menuList = []
 
-const menus = {
+const menuCtx = {
     file: [
         {
             type: "tree",
@@ -14,7 +14,8 @@ const menus = {
             list: [
                 {
                     type: "button",
-                    label: "Animation"
+                    label: "Animation",
+                    shortcut: "Ctrl+N/Cmd+N"
                 },
             ]
         }
