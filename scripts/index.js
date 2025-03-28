@@ -56,6 +56,7 @@ let posY = 0; // 0 is center
 
 let mouseInFrame = false;
 let mouseInCanvas = false;
+let mouseHover = false;
 
 let mouseDown = false;
 
@@ -423,7 +424,7 @@ const changeMousePos = (e) => {
 
   //console.log(mouseX - (displayWidth / 2), mouseY - (displayHeight / 2));
 
-  mouseInFrame = ((cursorX >= 0 && cursorX < displayWidth) && (cursorY >= 0 && cursorY < displayHeight))
+  mouseInFrame = ((cursorX >= 0 && cursorX < displayWidth) && (cursorY >= 0 && cursorY < displayHeight)) && mouseHover
 
   //console.log(mouseX, mouseY, mouseInFrame)
 
@@ -542,6 +543,18 @@ window.addEventListener("load", () => {
     document.addEventListener("pointermove", changeMousePos);
     document.addEventListener("wheel", wheel, { passive: false });
     document.addEventListener("touchmove", touch, { passive: false });
+
+    canvasEl.addEventListener("mouseover", () => {
+      mouseHover = true;
+      mouseInFrame = ((cursorX >= 0 && cursorX < displayWidth) && (cursorY >= 0 && cursorY < displayHeight)) && mouseHover
+      render();
+    })
+
+    canvasEl.addEventListener("mouseout", () => {
+      mouseHover = false;
+      mouseInFrame = ((cursorX >= 0 && cursorX < displayWidth) && (cursorY >= 0 && cursorY < displayHeight)) && mouseHover
+      render();
+    })
 
     image.addEventListener("load", render)
 
