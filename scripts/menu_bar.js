@@ -20,18 +20,54 @@ const menuCtx = {
             ]
         }
     ],
+    edit: [
+        {
+            type: "button",
+            label: "Redo",
+        },
+        {
+            type: "button",
+            label: "Undo",
+        },
+        {
+            type: "separator"
+        },
+        {
+            type: "button",
+            label: "Cut",
+        },
+        {
+            type: "button",
+            label: "Copy",
+        },
+        {
+            type: "button",
+            label: "Paste",
+        }
+    ],
     help: [
         {
             type: "button",
             label: "Go to GitHub",
-        },
-        {
-            type: "separator",
+            func: () => {
+                window.open("https://github.com/AlaTomKing/pixomato");
+            }
         },
         {
             type: "button",
             label: "Documentation",
             shortcut: "F2",
+            func: () => {
+                window.open("https://alatomking.github.io/pixomato/docs");
+            }
+        },
+        {
+            type: "button",
+            label: "Return to alatomking.github.io",
+            shortcut: "F2",
+            func: () => {
+                window.open("https://alatomking.github.io");
+            }
         }
     ]
 }
@@ -41,7 +77,7 @@ let menuHover = false
 let menuDebounce = false;
 let currentElementHover
 
-const createMenuBtn = (name) => {
+const createMenuBtn = (name, ctxList) => {
     const btn = document.createElement("div");
     btn.className = "menu-tab-btn";
     btn.ariaLabel = name;
@@ -50,7 +86,7 @@ const createMenuBtn = (name) => {
     label.className = "menu-btn-label";
     label.innerHTML = name
 
-    let makeActive = addContextMenuBar(btn, label);
+    let makeActive = addContextMenuBar(btn, label, ctxList);
 
     btn.addEventListener("mousedown", (e) => {
         if (e.button === 0 && !ctxMenuBarOpen) {
@@ -70,7 +106,7 @@ const createMenuBtn = (name) => {
     })
 
     btn.addEventListener("mouseover", () => {
-        if (ctxMenuBarOpen && currentElementHover) {
+        if (ctxMenuBarOpen && currentElementHover && currentElementHover != btn) {
             currentElementHover.className = "menu-tab-btn";
             btn.className = "menu-tab-btn-selected";
             currentElementHover = btn
@@ -84,13 +120,13 @@ const createMenuBtn = (name) => {
     menuList.push(btn);
 }
 
-const fileBtn = createMenuBtn("File")
-const editBtn = createMenuBtn("Edit")
-const selectBtn = createMenuBtn("Select")
-const insertBtn = createMenuBtn("Insert")
-const viewBtn = createMenuBtn("View")
-const windowBtn = createMenuBtn("Window")
-const helpBtn = createMenuBtn("Help")
+const fileBtn = createMenuBtn("File", menuCtx.file)
+const editBtn = createMenuBtn("Edit", menuCtx.edit)
+const selectBtn = createMenuBtn("Select", menuCtx.select)
+const insertBtn = createMenuBtn("Insert", menuCtx.insert)
+const viewBtn = createMenuBtn("View", menuCtx.view)
+const windowBtn = createMenuBtn("Window", menuCtx.window)
+const helpBtn = createMenuBtn("Help", menuCtx.help)
 
 menuContainer.addEventListener("mouseover", () => {
     menuHover = true;

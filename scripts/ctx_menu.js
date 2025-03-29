@@ -37,12 +37,16 @@ const closeCtxMenu = () => {
 //     }
 
 //     makeActive() {
-    
+
 //     }
 // }
 
-const addContextMenuBar = (element, label) => {
-    const makeActive = () => {
+const addContextMenuBar = (element, label, ctxList) => {
+    const makeActive = () => { // OPEN CTX MENU
+        while (ctxMenuEl.firstChild) {
+            ctxMenuEl.firstChild.remove();
+        }
+
         const rect = label.getBoundingClientRect();
 
         const posX = rect.left;
@@ -53,6 +57,31 @@ const addContextMenuBar = (element, label) => {
 
         ctxMenuEl.style.left = posX + "px";
         ctxMenuEl.style.top = posY + "px";
+
+        const eval = (list) => {
+            if (list)
+                list.forEach(e => {
+                    switch (e.type) {
+                        case "button":
+                            const btn = document.createElement("div");
+                            btn.className = "context-menu-button";
+                            btn.innerHTML = e.label;
+                            if (e.func) btn.addEventListener("click", e.func);
+                            ctxMenuEl.appendChild(btn);
+                            break;
+                        case "separator":
+                            const sep = document.createElement("div");
+                            sep.className = "context-menu-separator";
+                            ctxMenuEl.appendChild(sep);
+                            break;
+                        case "tree":
+                            eval(e.list)
+                            break;
+                    }
+                });
+        }
+
+        eval(ctxList);
 
         ctxMenuBarOpen = true;
     }
@@ -81,7 +110,11 @@ document.addEventListener("mousedown", (e) => {
 });
 
 document.addEventListener("mouseup", (e) => {
-    if (e.button === 2) {
+    if (e.button === 2) { // OPEN CTX MENU
+        while (ctxMenuEl.firstChild) {
+            ctxMenuEl.firstChild.remove();
+        }
+
         ctxFrameEl.style.display = "block";
         ctxFrameEl.style.pointerEvents = null;
         //ctxMenuEl.style.display = "block";

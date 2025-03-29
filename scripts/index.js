@@ -144,7 +144,6 @@ const render = () => {
     canvasHeight
   );
 
-  console.log(canvasPosX, canvasPosY, canvasWidth, canvasHeight)
   //ctx.globalAlpha = 1
 
   ctx.shadowColor = "transparent"
