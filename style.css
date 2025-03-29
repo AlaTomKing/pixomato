@@ -7,6 +7,8 @@
     --tab-font-size: 13px;
     --tab-container-gap: 0px;
     --tab-container-padding: 0px;
+    
+    --ctx-menu-font-size: 12px;
 
     --widget-gap: 2px;
 
@@ -329,11 +331,18 @@ button:hover:active {
 .context-menu {
     position: absolute;
 
-    height: 100px;
-    width: 100px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+
+    height: auto;
+    width: auto;
 
     background-color: var(--context-menu-color);
     outline: var(--stroke-size) solid var(--stroke-color);
+
+    pointer-events: all;
+
+    font-size: var(--ctx-menu-font-size);
 
     opacity: 1;
     /* animation: fade-in 0.15s; */
@@ -341,6 +350,27 @@ button:hover:active {
     /* box-shadow: 0px 0px 0px 0.4px #000000, 0px 4px 10px 0px rgba(0, 0, 0, 0.25); */
 
     border-radius: 5px;
+}
+
+.context-menu-button {
+    height: 22px;
+    line-height: 22px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-inline: 2px;
+}
+
+.context-menu-button:hover {
+    border-radius: 3px;
+    background-color: gray;
+}
+
+.context-menu-separator {
+    width: 100%;
+    margin-top: 2.5px;
+    margin-bottom: 2.5px;
+    height: var(--stroke-size);
+    background-color: var(--stroke-color);
 }
 
 /*#canvas-widget {
