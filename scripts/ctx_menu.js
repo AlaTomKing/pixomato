@@ -4,6 +4,7 @@ let contextMenus
 
 const ctxFrameEl = document.getElementById("context-menu-frame")
 const ctxMenuEl = document.getElementById("context-menu")
+const ctxMenuContainer = document.getElementById("context-menu-container")
 
 const ctxOffsetX = 1
 const ctxOffsetY = 1
@@ -41,11 +42,53 @@ const closeCtxMenu = () => {
 //     }
 // }
 
+const eval = (list) => {
+    if (list) {
+        list.forEach(e => {
+            switch (e.type) {
+                case "button":
+                    const btn = document.createElement("div");
+                    const lbl = document.createElement("div");
+                    const shc = document.createElement("div");
+                    const lfi = document.createElement("div");
+                    const rti = document.createElement("div");
+                    const inn = document.createElement("div");
+                    btn.className = "context-menu-button";
+                    inn.className = "context-menu-button-inner";
+                    shc.className = "context-menu-button-shortcuts";
+                    lfi.className = "context-menu-button-left-icon";
+                    rti.className = "context-menu-button-right-icon";
+                    lbl.className = "context-menu-button-label";
+                    lbl.innerHTML = e.label;
+                    shc.innerHTML = e.shortcut?.win
+                    if (e.func) btn.addEventListener("click", () => { e.func(); closeCtxMenu(); });
+                    inn.appendChild(lfi);
+                    inn.appendChild(lbl);
+                    inn.appendChild(rti);
+                    if (e.shortcut) inn.appendChild(shc);
+                    btn.appendChild(inn);
+                    ctxMenuContainer.appendChild(btn);
+                    break;
+                case "separator":
+                    const sep = document.createElement("div");
+                    sep.className = "context-menu-separator";
+                    ctxMenuContainer.appendChild(sep);
+                    break;
+                case "tree":
+                    eval(e.list)
+                    break;
+            }
+        });
+    }
+}
+
 const addContextMenuBar = (element, label, ctxList) => {
     const makeActive = () => { // OPEN CTX MENU
-        while (ctxMenuEl.firstChild) {
-            ctxMenuEl.firstChild.remove();
+        while (ctxMenuContainer.firstChild) {
+            ctxMenuContainer.firstChild.remove();
         }
+
+        eval(ctxList);
 
         const rect = label.getBoundingClientRect();
 
@@ -58,31 +101,6 @@ const addContextMenuBar = (element, label, ctxList) => {
         ctxMenuEl.style.left = posX + "px";
         ctxMenuEl.style.top = posY + "px";
 
-        const eval = (list) => {
-            if (list)
-                list.forEach(e => {
-                    switch (e.type) {
-                        case "button":
-                            const btn = document.createElement("div");
-                            btn.className = "context-menu-button";
-                            btn.innerHTML = e.label;
-                            if (e.func) btn.addEventListener("click", e.func);
-                            ctxMenuEl.appendChild(btn);
-                            break;
-                        case "separator":
-                            const sep = document.createElement("div");
-                            sep.className = "context-menu-separator";
-                            ctxMenuEl.appendChild(sep);
-                            break;
-                        case "tree":
-                            eval(e.list)
-                            break;
-                    }
-                });
-        }
-
-        eval(ctxList);
-
         ctxMenuBarOpen = true;
     }
 
@@ -91,8 +109,38 @@ const addContextMenuBar = (element, label, ctxList) => {
     return makeActive;
 }
 
-const addContextMenu = () => {
+const addContextMenu = (element, ctxList) => {
+    element.addEventListener("mouseup", (e) => {
+        if (e.button === 2) { // OPEN CTX MENU
+            while (ctxMenuContainer.firstChild) {
+                ctxMenuContainer.firstChild.remove();
+            }
 
+            eval(ctxList);
+
+            ctxFrameEl.style.display = "block";
+            ctxFrameEl.style.pointerEvents = null;
+            //ctxMenuEl.style.display = "block";
+
+            ctxMenuEl.style.animation = null;
+
+            const rect = ctxMenuContainer.getBoundingClientRect();
+
+            let posX = e.clientX + ctxOffsetX;
+            let posY = e.clientY + ctxOffsetY;
+
+            if (posX + rect.width > window.innerWidth) {
+                posX = e.clientX - rect.width - ctxOffsetX;
+            }
+
+            if (posY + rect.height > window.innerHeight) {
+                posY = e.clientY - rect.height - ctxOffsetY;
+            }
+
+            ctxMenuEl.style.left = posX + "px";
+            ctxMenuEl.style.top = posY + "px";
+        }
+    })
 }
 
 document.addEventListener("contextmenu", (e) => {
@@ -101,43 +149,46 @@ document.addEventListener("contextmenu", (e) => {
 
 document.addEventListener("mousedown", (e) => {
     if (!menuHover) {
-        const rect = ctxMenuEl.getBoundingClientRect();
+        const rect = ctxMenuContainer.getBoundingClientRect();
 
-        if (!((e.clientX >= rect.left && e.clientX <= rect.left + rect.width) && (e.clientY >= rect.top && e.clientY <= rect.top + rect.height))) {
+        if (!((e.clientX >= rect.left &&
+            e.clientX < rect.left + rect.width) &&
+            (e.clientY >= rect.top &&
+            e.clientY < rect.top + rect.height))) {
             closeCtxMenu();
         }
     }
 });
 
-document.addEventListener("mouseup", (e) => {
-    if (e.button === 2) { // OPEN CTX MENU
-        while (ctxMenuEl.firstChild) {
-            ctxMenuEl.firstChild.remove();
-        }
+// document.addEventListener("mouseup", (e) => {
+//     if (e.button === 2) { // OPEN CTX MENU
+//         while (ctxMenuEl.firstChild) {
+//             ctxMenuEl.firstChild.remove();
+//         }
 
-        ctxFrameEl.style.display = "block";
-        ctxFrameEl.style.pointerEvents = null;
-        //ctxMenuEl.style.display = "block";
+//         ctxFrameEl.style.display = "block";
+//         ctxFrameEl.style.pointerEvents = null;
+//         //ctxMenuEl.style.display = "block";
 
-        ctxMenuEl.style.animation = null;
+//         ctxMenuEl.style.animation = null;
 
-        const rect = ctxMenuEl.getBoundingClientRect();
+//         const rect = ctxMenuEl.getBoundingClientRect();
 
-        let posX = e.clientX + ctxOffsetX;
-        let posY = e.clientY + ctxOffsetY;
+//         let posX = e.clientX + ctxOffsetX;
+//         let posY = e.clientY + ctxOffsetY;
 
-        if (posX + rect.width > window.innerWidth) {
-            posX = e.clientX - rect.width - ctxOffsetX;
-        }
+//         if (posX + rect.width > window.innerWidth) {
+//             posX = e.clientX - rect.width - ctxOffsetX;
+//         }
 
-        if (posY + rect.height > window.innerHeight) {
-            posY = e.clientY - rect.height - ctxOffsetY;
-        }
+//         if (posY + rect.height > window.innerHeight) {
+//             posY = e.clientY - rect.height - ctxOffsetY;
+//         }
 
-        ctxMenuEl.style.left = posX + "px";
-        ctxMenuEl.style.top = posY + "px";
-    }
-})
+//         ctxMenuEl.style.left = posX + "px";
+//         ctxMenuEl.style.top = posY + "px";
+//     }
+// })
 
 window.addEventListener("blur", (e) => {
     closeCtxMenu()
