@@ -262,7 +262,7 @@ const tab3 = new tab();
 const tab4 = new tab();
 
 const canvasWidget = new widget("New Animation");
-const toolsWidget = new widget("Tools", {xMax: "64px"});
+const toolsWidget = new widget("Tools", {xMax: "128px"});
 const propertiesWidget = new widget("Properties", {xMax: "312px"});
 const layerWidget = new widget("Layer");
 const timelineWidget = new widget("Timeline", {yMax: "296px"});
@@ -286,5 +286,18 @@ dock2.addChild(dock1)
 dock2.addChild(tab2)
 
 mainFrame.appendChild(dock2.element)
+
+const colorThing = document.createElement("input");
+colorThing.type = "color"
+
+const colorLabel = document.createElement("label")
+colorLabel.innerHTML = "Color"
+
+colorThing.addEventListener("change", (e) => {
+    currentColor = colorThing.value;
+}, false);
+
+toolsWidget.element.appendChild(colorThing)
+toolsWidget.element.appendChild(colorLabel)
 
 /*console.log("worky?")*/

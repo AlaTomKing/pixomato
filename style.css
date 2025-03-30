@@ -358,7 +358,7 @@ button:hover:active {
     position: relative;
 
     height: fit-content;
-    width: 200px;
+    width: fit-content;
 
     pointer-events: all;
 
