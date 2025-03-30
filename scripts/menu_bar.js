@@ -15,19 +15,60 @@ const menuCtx = {
                 {
                     type: "button",
                     label: "Animation",
-                    shortcut: "Ctrl+N/Cmd+N"
+                    shortcut: {
+                        win: "Ctrl+N",
+                        mac: "Meta+N"
+                    },
                 },
             ]
+        },
+        {
+            type: "separator"
+        },
+        {
+            type: "button",
+            label: "Save",
+            shortcut: {
+                win: "Ctrl+S",
+                mac: "Meta+S",
+            }
+        },
+        {
+            type: "button",
+            label: "Save as...",
+            shortcut: {
+                win: "Ctrl+Shift+S",
+                mac: "Meta+Shift+S"
+            }
+        },
+        {
+            type: "separator"
+        },
+        {
+            type: "button",
+            label: "Project settings"
+        },
+        {
+            type: "button",
+            label: "Preferences"
         }
     ],
     edit: [
         {
             type: "button",
             label: "Redo",
+            shortcut: {
+                win: "Ctrl+Z",
+                mac: "Meta+Z",
+            }
         },
         {
             type: "button",
             label: "Undo",
+            shortcut: {
+                win: "Ctrl+Y",
+                mac: "Meta+Y",
+            }
         },
         {
             type: "separator"
@@ -35,15 +76,71 @@ const menuCtx = {
         {
             type: "button",
             label: "Cut",
+            shortcut: {
+                win: "Ctrl+X",
+                mac: "Meta+X",
+            }
         },
         {
             type: "button",
             label: "Copy",
+            shortcut: {
+                win: "Ctrl+C",
+                mac: "Meta+C",
+            }
         },
         {
             type: "button",
             label: "Paste",
+            shortcut: {
+                win: "Ctrl+V",
+                mac: "Meta+V",
+            }
         }
+    ],
+    select: [
+        {
+            type: "button",
+            label: "Select all",
+            shortcut: {
+                win: "Ctrl+A",
+                mac: "Meta+A",
+            }
+        }
+    ],
+    view: [
+        {
+            type: "button",
+            label: "Timeline",
+            shortcut: {
+                win: "Ctrl+F1",
+                mac: "Meta+F1",
+            }
+        },
+        {
+            type: "button",
+            label: "Tools",
+            shortcut: {
+                win: "Ctrl+F2",
+                mac: "Meta+F2",
+            }
+        },
+        {
+            type: "button",
+            label: "Properties",
+            shortcut: {
+                win: "Ctrl+F3",
+                mac: "Meta+F3",
+            }
+        },
+        {
+            type: "button",
+            label: "Layer",
+            shortcut: {
+                win: "Ctrl+F4",
+                mac: "Meta+F4",
+            }
+        },
     ],
     help: [
         {
@@ -56,18 +153,23 @@ const menuCtx = {
         {
             type: "button",
             label: "Documentation",
-            shortcut: "F2",
             func: () => {
                 window.open("https://alatomking.github.io/pixomato/docs");
             }
         },
         {
             type: "button",
-            label: "Return to alatomking.github.io",
-            shortcut: "F2",
+            label: "Go to alatomking.github.io",
             func: () => {
                 window.open("https://alatomking.github.io");
             }
+        },
+        {
+            type: "separator"
+        },
+        {
+            type: "button",
+            label: "About Pixomato"
         }
     ]
 }

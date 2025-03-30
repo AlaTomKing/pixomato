@@ -135,6 +135,18 @@ class tab {
             }
         })
 
+        addContextMenu(tabItem, [
+            {
+                type: "button",
+                label: "Close",
+                func: () => { widget.close(); }
+            },
+            {
+                type: "button",
+                label: "Detatch"
+            }
+        ])
+
         this.selectedIndex = this.tabItems.length;
         this.currentWidget = widget;
 

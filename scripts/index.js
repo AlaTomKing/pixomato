@@ -533,7 +533,7 @@ window.addEventListener("load", () => {
   if (ctx) {
     ctx.imageSmoothingEnabled = false;
 
-    window.addEventListener("resize", resize);
+    // window.addEventListener("resize", resize);
     window.addEventListener("mouseout", mouseout);
 
     document.addEventListener("pointerdown", mousedown);
@@ -542,6 +542,10 @@ window.addEventListener("load", () => {
     document.addEventListener("pointermove", changeMousePos);
     document.addEventListener("wheel", wheel, { passive: false });
     document.addEventListener("touchmove", touch, { passive: false });
+
+    new ResizeObserver(resize).observe(canvasEl.parentElement);
+
+    canvasEl.addEventListener("resize", resize);
 
     canvasEl.addEventListener("mouseover", () => {
       mouseHover = true;
