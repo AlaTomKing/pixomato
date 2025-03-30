@@ -143,6 +143,19 @@ class tab {
             },
             {
                 type: "button",
+                label: "Close all",
+                func: () => { this.close(); }
+            },
+            {
+                type: "button",
+                label: "Close others",
+                func: () => { widget.close(); }
+            },
+            {
+                type: "separator"
+            },
+            {
+                type: "button",
                 label: "Detatch"
             }
         ])
@@ -249,7 +262,7 @@ const tab3 = new tab();
 const tab4 = new tab();
 
 const canvasWidget = new widget("New Animation");
-const toolsWidget = new widget("Tools", {xMax: "128px"});
+const toolsWidget = new widget("Tools", {xMax: "64px"});
 const propertiesWidget = new widget("Properties", {xMax: "312px"});
 const layerWidget = new widget("Layer");
 const timelineWidget = new widget("Timeline", {yMax: "296px"});
@@ -258,8 +271,6 @@ const canvasEl = document.createElement("canvas");
 canvasEl.id = "drawing-canvas";
 
 canvasWidget.element.appendChild(canvasEl);
-
-toolsWidget.element.style.maxWidth = "64px"
 
 tab1.addWidget(canvasWidget)
 tab2.addWidget(propertiesWidget);

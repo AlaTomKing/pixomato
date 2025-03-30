@@ -357,8 +357,8 @@ button:hover:active {
 .context-menu-container {
     position: relative;
 
-    height: auto;
-    width: auto;
+    height: fit-content;
+    width: 200px;
 
     pointer-events: all;
 
@@ -376,8 +376,8 @@ button:hover:active {
 
 .context-menu-button-inner > .context-menu-button-shortcuts {
     display: inline;
-    height: 100%;
-    width: auto;
+    height: 22px;
+    width: fit-content;
     line-height: 22px;
     padding-left: 44px;
     vertical-align: top;
@@ -386,21 +386,21 @@ button:hover:active {
 
 .context-menu-button-inner > .context-menu-button-left-icon {
     display: inline-block;
-    height: 100%;
+    height: 22px;
     width: 22px;
 }
 
 .context-menu-button-inner > .context-menu-button-right-icon {
     display: inline;
-    height: 100%;
+    height: 22px;
     width: 22px;
     float: right;
 }
 
 .context-menu-button-inner > .context-menu-button-label {
     display: inline-block;
-    height: 100%;
-    width: auto;
+    height: 22px;
+    width: fit-content;
     line-height: 22px;
     vertical-align: top;
     /* padding-left: 5px; */

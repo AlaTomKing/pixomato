@@ -60,6 +60,8 @@ let mouseHover = false;
 
 let mouseDown = false;
 
+let currentColor = "rgb(0,0,0)"
+
 if (canvasSizeX / canvasSizeY > displayWidth / displayHeight) {
   zoom = ((displayWidth) / (canvasSizeX * 1.2)).clamp(0.01, 100)
 } else {
@@ -148,14 +150,14 @@ const render = () => {
 
   ctx.shadowColor = "transparent"
 
-  for (const [key, value] of Object.entries(pixels)) {
+  for (const [key, color] of Object.entries(pixels)) {
     let [pixelX, pixelY] = key.split(":");
     pixelX = Number(pixelX);
     pixelY = Number(pixelY);
 
     //const cellSize = canvasEl.width / canvasSizeX
 
-    setRGBFill(0, 0, 0, 1);
+    setHexFill(color);
     fillRect(
       canvasPosX + Math.floor(pixelX * zoom * res) / res,
       canvasPosY + Math.floor(pixelY * zoom * res) / res,
@@ -242,7 +244,7 @@ const render = () => {
 }
 
 const drawPixel = () => {
-  pixels[`${currentPixelX}:${currentPixelY}`] = true;
+  pixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
 }
 
 const drawLine = (x0, y0, x1, y1) => {
