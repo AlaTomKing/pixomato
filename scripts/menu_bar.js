@@ -225,9 +225,9 @@ const createMenuBtn = (name, ctxList) => {
 const fileBtn = createMenuBtn("File", menuCtx.file)
 const editBtn = createMenuBtn("Edit", menuCtx.edit)
 const selectBtn = createMenuBtn("Select", menuCtx.select)
-const insertBtn = createMenuBtn("Insert", menuCtx.insert)
+//const insertBtn = createMenuBtn("Insert", menuCtx.insert)
 const viewBtn = createMenuBtn("View", menuCtx.view)
-const windowBtn = createMenuBtn("Window", menuCtx.window)
+//const windowBtn = createMenuBtn("Window", menuCtx.window)
 const helpBtn = createMenuBtn("Help", menuCtx.help)
 
 menuContainer.addEventListener("mouseover", () => {

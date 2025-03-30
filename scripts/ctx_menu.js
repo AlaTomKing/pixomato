@@ -75,7 +75,27 @@ const eval = (list) => {
                     ctxMenuContainer.appendChild(sep);
                     break;
                 case "tree":
-                    eval(e.list)
+                    const btn1 = document.createElement("div");
+                    const lbl1 = document.createElement("div");
+                    const shc1 = document.createElement("div");
+                    const lfi1 = document.createElement("div");
+                    const rti1 = document.createElement("div");
+                    const inn1 = document.createElement("div");
+                    btn1.className = "context-menu-button";
+                    inn1.className = "context-menu-button-inner";
+                    shc1.className = "context-menu-button-shortcuts";
+                    lfi1.className = "context-menu-button-left-icon";
+                    rti1.className = "context-menu-button-right-icon";
+                    lbl1.className = "context-menu-button-label";
+                    lbl1.innerHTML = e.label;
+                    shc1.innerHTML = e.shortcut?.win
+                    inn1.appendChild(lfi1);
+                    inn1.appendChild(lbl1);
+                    inn1.appendChild(rti1);
+                    if (e.shortcut) inn1.appendChild(shc1);
+                    btn1.appendChild(inn1);
+                    ctxMenuContainer.appendChild(btn1);
+                    //eval(e.list)
                     break;
             }
         });
@@ -91,14 +111,18 @@ const addContextMenuBar = (element, label, ctxList) => {
         eval(ctxList);
 
         const rect = label.getBoundingClientRect();
+        const rect1 = ctxMenuContainer.getBoundingClientRect();
 
         const posX = rect.left;
         const posY = rect.top + rect.height;
 
+        const maxLeftVal = window.innerWidth - rect1.width;
+        //const maxTopVal = window.innerHeight - rect1.height;
+
         ctxFrameEl.style.display = "block";
         ctxFrameEl.style.pointerEvents = "none";
 
-        ctxMenuEl.style.left = posX + "px";
+        ctxMenuEl.style.left = Math.min(posX, maxLeftVal) + "px";
         ctxMenuEl.style.top = posY + "px";
 
         ctxMenuBarOpen = true;
@@ -137,8 +161,8 @@ const addContextMenu = (element, ctxList) => {
                 posY = e.clientY - rect.height - ctxOffsetY;
             }
 
-            ctxMenuEl.style.left = posX + "px";
-            ctxMenuEl.style.top = posY + "px";
+            ctxMenuEl.style.left = Math.max(0, posX) + "px";
+            ctxMenuEl.style.top = Math.max(0, posY) + "px";
         }
     })
 }
