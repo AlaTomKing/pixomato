@@ -272,7 +272,7 @@ canvasEl.id = "drawing-canvas";
 
 canvasWidget.element.appendChild(canvasEl);
 
-tab1.addWidget(canvasWidget)
+/*tab1.addWidget(canvasWidget)
 tab2.addWidget(propertiesWidget);
 tab2.addWidget(layerWidget);
 tab3.addWidget(timelineWidget);
@@ -283,21 +283,59 @@ dock1.addChild(tab3)
 
 dock2.addChild(tab4)
 dock2.addChild(dock1)
-dock2.addChild(tab2)
+dock2.addChild(tab2)*/
+
+tab1.addWidget(canvasWidget);
+tab4.addWidget(toolsWidget);
+dock2.addChild(tab4);
+dock2.addChild(tab1);
 
 mainFrame.appendChild(dock2.element)
 
-const colorThing = document.createElement("input");
-colorThing.type = "color"
+// MESS
 
-const colorLabel = document.createElement("label")
-colorLabel.innerHTML = "Color"
+const colorThing = document.createElement("input");
+colorThing.type = "color";
+colorThing.value = "#000000"
+
+const colorLabel = document.createElement("label");
+colorLabel.innerHTML = "Color";
+
+const numberThing = document.createElement("input");
+numberThing.type = "number"
+numberThing.style.width = "64px";
+numberThing.value = 1
+numberThing.min = 1
+numberThing.max = 16
+
+const sizeLabel = document.createElement("label");
+sizeLabel.innerHTML = "Size";
+
+const newLine = document.createElement("br")
 
 colorThing.addEventListener("change", (e) => {
     currentColor = colorThing.value;
 }, false);
 
+const selectList = document.createElement("select");
+
+const pixelBrushOption = document.createElement("option");
+pixelBrushOption.value = "pixel_brush"
+pixelBrushOption.innerHTML = "Pixel Brush"
+
+const eraseOption = document.createElement("option");
+eraseOption.value = "erase"
+eraseOption.innerHTML = "Eraser"
+
+selectList.appendChild(pixelBrushOption)
+selectList.appendChild(eraseOption)
+
+toolsWidget.element.appendChild(selectList)
+toolsWidget.element.appendChild(newLine)
 toolsWidget.element.appendChild(colorThing)
 toolsWidget.element.appendChild(colorLabel)
+toolsWidget.element.appendChild(newLine)
+toolsWidget.element.appendChild(numberThing)
+toolsWidget.element.appendChild(sizeLabel)
 
 /*console.log("worky?")*/

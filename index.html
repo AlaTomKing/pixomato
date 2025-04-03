@@ -128,9 +128,9 @@
     <script>
         const printWarning = (lang) => {
             if (lang === "en") {
-                console.log("%c" + "Important!!!", "color: #ff3300; font-size: 300%; -webkit-text-stroke: 1px black; font-weight: bold;")
-                console.log("%c" + "Hi! If you are reading this from a console, don't put anything in, unless you know what the code you're putting is!", "font-size: 150%;")
-                console.log("%c" + "If you're here to mod the application, have fun! But be careful on what type of mod it is! You may be at risk of losing data!", "font-style: italic;")
+                console.log("%c" + "Important!!!", "font-family: Tahoma, monospace; color: #ff3300; font-size: 300%; -webkit-text-stroke: 1px black; font-weight: bold;")
+                console.log("%c" + "Hi! If you are reading this from a console, don't put anything in, unless you know what the code you're putting is!", "font-family: Tahoma, monospace; font-size: 150%;")
+                console.log("%c" + "If you're here to mod the application, have fun! But be careful on what type of mod it is! You may be at risk of losing data!", "font-family: Tahoma, monospace; font-style: italic;")
                 console.log("Thank you for visiting my website!");
             } /*else if (lang == "de") {
                 console.log("%c" + "Wichtig!!!", "color: #ff3300; font-size: 300%; -webkit-text-stroke: 1px black; font-weight: bold;")
@@ -140,7 +140,7 @@
             }*/
         }
 
-        printWarning("en")
+        //printWarning("en")
 
         function memorySizeOf(obj) {
             var bytes = 0;
@@ -183,6 +183,7 @@
         }
     </script>
 
+    <script src="scripts/file.js"></script>
     <script src="scripts/ctx_menu.js"></script>
     <script src="scripts/widgets.js"></script>
     <script src="scripts/animation.js"></script>

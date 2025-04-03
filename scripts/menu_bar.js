@@ -46,6 +46,28 @@ const menuCtx = {
         },
         {
             type: "button",
+            label: "Export PNG...",
+            shortcut: {
+                win: "Ctrl+Shift+E",
+                mac: "Meta+Shift+E",
+            }
+        },
+        {
+            type: "button",
+            label: "Export QOI...",
+            shortcut: {
+                win: "Ctrl+Shift+E",
+                mac: "Meta+Shift+E",
+            },
+            func: () => {
+                encode(pixels);
+            }
+        },
+        {
+            type: "separator"
+        },
+        {
+            type: "button",
             label: "Project settings"
         },
         {

@@ -34,14 +34,16 @@ Number.prototype.clamp = function (min, max) {
 //const canvasEl = document.getElementById("drawing-canvas");
 const ctx = canvasEl.getContext("2d");
 
-let pixels = {};
-
 const rectSize = 10;
 
 let cursorX, cursorY = 0;
 
 let canvasSizeX = 36;
 let canvasSizeY = 24;
+let channels = 3; // 3: RGB, 4: RGBA
+
+let pixels = new Uint8Array(canvasSizeX * canvasSizeY * channels).fill(255);
+let outsidePixels = {};
 
 let currentPixelX = 0;
 let currentPixelY = 0;
@@ -60,7 +62,7 @@ let mouseHover = false;
 
 let mouseDown = false;
 
-let currentColor = "rgb(0,0,0)"
+let currentColor = "#000000"
 
 if (canvasSizeX / canvasSizeY > displayWidth / displayHeight) {
   zoom = ((displayWidth) / (canvasSizeX * 1.2)).clamp(0.01, 100)
@@ -150,12 +152,31 @@ const render = () => {
 
   ctx.shadowColor = "transparent"
 
-  for (const [key, color] of Object.entries(pixels)) {
+  for (let i = 0; i < pixels.length; i += channels) {
+    let pixelX = (i / channels) % canvasSizeX;
+    let pixelY = Math.floor((i / channels) / canvasSizeX);
+
+    //const cellSize = canvasEl.width / canvasSizeX
+
+    setHexFill(`rgb(${pixels[i]},${pixels[i+1]},${pixels[i+2]})`);
+    fillRect(
+      canvasPosX + Math.floor(pixelX * zoom * res) / res,
+      canvasPosY + Math.floor(pixelY * zoom * res) / res,
+      (canvasPosX + Math.floor((pixelX + 1) * zoom * res) / res) - (canvasPosX + Math.floor(pixelX * zoom * res) / res),
+      (canvasPosY + Math.floor((pixelY + 1) * zoom * res) / res) - (canvasPosY + Math.floor(pixelY * zoom * res) / res)
+    )
+    /*fillRect(
+      Math.round(Math.round((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX) + (pixelX * (zoom))),
+      Math.round(Math.round((displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY) + (pixelY * (zoom))),
+      Math.round(zoom),
+      Math.round(zoom)
+    )*/
+  }
+
+  for (const [key, color] of Object.entries(outsidePixels)) {
     let [pixelX, pixelY] = key.split(":");
     pixelX = Number(pixelX);
     pixelY = Number(pixelY);
-
-    //const cellSize = canvasEl.width / canvasSizeX
 
     setHexFill(color);
     fillRect(
@@ -164,12 +185,6 @@ const render = () => {
       (canvasPosX + Math.floor((pixelX+1) * zoom * res) / res) - (canvasPosX + Math.floor(pixelX * zoom * res) / res),
       (canvasPosY + Math.floor((pixelY+1) * zoom * res) / res) - (canvasPosY + Math.floor(pixelY * zoom * res) / res)
     )
-    /*fillRect(
-      Math.round(Math.round((displayWidth / 2) - ((canvasSizeX) * zoom / 2) - posX) + (pixelX * (zoom))),
-      Math.round(Math.round((displayHeight / 2) - ((canvasSizeY) * zoom / 2) - posY) + (pixelY * (zoom))),
-      Math.round(zoom),
-      Math.round(zoom)
-    )*/
   }
 
   if (mouseInFrame) {
@@ -244,7 +259,43 @@ const render = () => {
 }
 
 const drawPixel = () => {
-  pixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
+  // [0,0,0], [0,0,0], [0,0,0]
+  // [0,0,0], [0,0,0], [0,0,0]
+  // [0,0,0], [0,0,0], [0,0,0]
+
+  if (mouseInCanvas) {
+    const position = (currentPixelX * channels) + (currentPixelY * (canvasSizeX * channels));
+    //console.log("position: " + position)
+    const r = Number("0x" + currentColor.substring(1, 3));
+    const g = Number("0x" + currentColor.substring(3, 5));
+    const b = Number("0x" + currentColor.substring(5, 7));
+    pixels[position] = r;
+    pixels[position + 1] = g;
+    pixels[position + 2] = b;
+  } else {
+    outsidePixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
+  }
+  //pixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
+}
+
+const insertPixel = (currentPixelX, currentPixelY) => {
+  // [0,0,0], [0,0,0], [0,0,0]
+  // [0,0,0], [0,0,0], [0,0,0]
+  // [0,0,0], [0,0,0], [0,0,0]
+
+  if (mouseInCanvas) {
+    const position = (currentPixelX * channels) + (currentPixelY * (canvasSizeX * channels));
+    //console.log("position: " + position)
+    const r = Number("0x" + currentColor.substring(1, 3));
+    const g = Number("0x" + currentColor.substring(3, 5));
+    const b = Number("0x" + currentColor.substring(5, 7));
+    pixels[position] = r;
+    pixels[position + 1] = g;
+    pixels[position + 2] = b;
+  } else {
+    outsidePixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
+  }
+  //pixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
 }
 
 const drawLine = (x0, y0, x1, y1) => {
@@ -310,7 +361,7 @@ const drawLine = (x0, y0, x1, y1) => {
   let err = dx - dy;
 
   while (true) {
-    drawPixel(x0, y0);
+    insertPixel(x0, y0);
 
     if ((x0 === x1) && (y0 === y1)) break;
     let e2 = 2 * err;
@@ -412,22 +463,21 @@ const changeMousePos = (e) => {
   cursorX = e.clientX - rect.left;
   cursorY = e.clientY - rect.top;
 
-  mouseInCanvas = (cursorX >= Math.round(displayWidth / 2 - canvasSizeX / 2 * zoom - posX) && cursorY >= Math.round(displayHeight / 2 - canvasSizeY / 2 * zoom - posY) &&
-    cursorX < Math.round(displayWidth / 2 + canvasSizeX / 2 * zoom - posX) && cursorY < Math.round(displayHeight / 2 + canvasSizeY / 2 * zoom - posY))
-
   currentPixelX = Math.floor((cursorX - (displayWidth / 2 - canvasSizeX / 2 * zoom - posX)) / zoom)
   currentPixelY = Math.floor((cursorY - (displayHeight / 2 - canvasSizeY / 2 * zoom - posY)) / zoom)
 
+  mouseInCanvas = (currentPixelX >= 0 && currentPixelX < canvasSizeX) && (currentPixelY >= 0 && currentPixelY < canvasSizeY)
+
   if (mouseDown && mouseInFrame) {
     //drawLine(oldX, oldY, cursorX, cursorY);
-    drawPixel(cursorX, cursorY);
+    drawPixel();
   }
 
   //console.log(mouseX - (displayWidth / 2), mouseY - (displayHeight / 2));
 
   mouseInFrame = ((cursorX >= 0 && cursorX < displayWidth) && (cursorY >= 0 && cursorY < displayHeight)) && mouseHover
 
-  //console.log(mouseX, mouseY, mouseInFrame)
+  //console.log(currentPixelX, currentPixelY)
 
   render();
 }
@@ -568,6 +618,8 @@ window.addEventListener("load", () => {
         pixels[i+":"+j] = true
       }
     }*/
+    
+    console.log(pixels.length);
 
     render();
     resize();
