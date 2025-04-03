@@ -46,6 +46,20 @@ const menuCtx = {
         },
         {
             type: "button",
+            label: "Import PNG...",
+        },
+        {
+            type: "button",
+            label: "Import QOI...",
+            func: () => {
+                encode_qoi(pixels);
+            }
+        },
+        {
+            type: "separator"
+        },
+        {
+            type: "button",
             label: "Export PNG...",
             shortcut: {
                 win: "Ctrl+Shift+E",
@@ -55,12 +69,8 @@ const menuCtx = {
         {
             type: "button",
             label: "Export QOI...",
-            shortcut: {
-                win: "Ctrl+Shift+E",
-                mac: "Meta+Shift+E",
-            },
             func: () => {
-                encode(pixels);
+                encode_qoi(pixels);
             }
         },
         {
