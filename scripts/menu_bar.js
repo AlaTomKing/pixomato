@@ -50,10 +50,7 @@ const menuCtx = {
         },
         {
             type: "button",
-            label: "Import QOI...",
-            func: () => {
-                encode_qoi(pixels);
-            }
+            label: "Import QOI..."
         },
         {
             type: "separator"
@@ -70,7 +67,12 @@ const menuCtx = {
             type: "button",
             label: "Export QOI...",
             func: () => {
-                encode_qoi(pixels);
+                encode_qoi(pixels, {
+                    width: canvasSizeX,
+                    height: canvasSizeY,
+                    channels: channels,
+                    colorspace: 1
+                });
             }
         },
         {
