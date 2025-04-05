@@ -67,10 +67,10 @@ const decode_qoi = (file) => {
 
 }
 
-const encode_png = (data) => {
+const encode_png = (data, desc) => {
 
 }
 
-const decode_png = (data) => {
+const decode_png = (file) => {
     
 }
