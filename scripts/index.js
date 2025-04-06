@@ -258,115 +258,52 @@ const render = () => {
   //requestAnimationFrame(render)
 }
 
-const drawPixel = () => {
-  // [0,0,0], [0,0,0], [0,0,0]
-  // [0,0,0], [0,0,0], [0,0,0]
-  // [0,0,0], [0,0,0], [0,0,0]
-
-  if (mouseInCanvas) {
-    const position = (currentPixelX * channels) + (currentPixelY * (canvasSizeX * channels));
-    //console.log("position: " + position)
-    const r = Number("0x" + currentColor.substring(1, 3));
-    const g = Number("0x" + currentColor.substring(3, 5));
-    const b = Number("0x" + currentColor.substring(5, 7));
-    pixels[position] = r;
-    pixels[position + 1] = g;
-    pixels[position + 2] = b;
-  } else {
-    outsidePixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
-  }
-  //pixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
-}
-
 const insertPixel = (currentPixelX, currentPixelY) => {
   // [0,0,0], [0,0,0], [0,0,0]
   // [0,0,0], [0,0,0], [0,0,0]
   // [0,0,0], [0,0,0], [0,0,0]
 
-  if (mouseInCanvas) {
-    const position = (currentPixelX * channels) + (currentPixelY * (canvasSizeX * channels));
-    //console.log("position: " + position)
-    const r = Number("0x" + currentColor.substring(1, 3));
-    const g = Number("0x" + currentColor.substring(3, 5));
-    const b = Number("0x" + currentColor.substring(5, 7));
-    pixels[position] = r;
-    pixels[position + 1] = g;
-    pixels[position + 2] = b;
-  } else {
-    outsidePixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
+  if (mouseInFrame) {
+    if (currentPixelX >= 0 && currentPixelX < canvasSizeX && currentPixelY >= 0 && currentPixelY < canvasSizeY) {
+      const position = (currentPixelX * channels) + (currentPixelY * (canvasSizeX * channels));
+      //console.log("position: " + position)
+      const r = Number("0x" + currentColor.substring(1, 3));
+      const g = Number("0x" + currentColor.substring(3, 5));
+      const b = Number("0x" + currentColor.substring(5, 7));
+      pixels[position] = r;
+      pixels[position + 1] = g;
+      pixels[position + 2] = b;
+    } else {
+      outsidePixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
+    }
   }
   //pixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
 }
 
+const drawPixel = () => {
+  insertPixel(currentPixelX, currentPixelY)
+}
+
 const drawLine = (x0, y0, x1, y1) => {
-  /*
-  psuedocode from wikipedia (dont delete incase of forgeting):
-
-  1.
-  dx = x2 − x1
-  dy = y2 − y1
-
-  for x from x1 to x2 do
-      y = y1 + dy × (x − x1) / dx
-      plot(x,y)
-
-  2.
-  plotLine(x0, y0, x1, y1)
-  dx = x1 - x0
-  dy = y1 - y0
-  D = 2*dy - dx
-  y = y0
-
-  for x from x0 to x1
-      plot(x, y)
-      if D > 0
-          y = y + 1
-          D = D - 2*dx
-      end if
-      D = D + 2*dy
-  */
-
-  /*let dx = x2 - x1;
-  let dy = y2 - y1;
-
-  if (x1 < x2)
-      for (let x = x1; x <= x2; x++) {
-          let y = Math.round(y1 + dy * (x - x1) / dx)
-
-          let index = 4 * (this.canvas.width * y + x);
-
-          var cArray = color.substring(4, color.length - 1).split(',')
-          this.pixelImageData.data[index] = cArray[0];
-          this.pixelImageData.data[index + 1] = cArray[1];
-          this.pixelImageData.data[index + 2] = cArray[2];
-          this.pixelImageData.data[index + 3] = 255;
-      }
-  else
-      for(let x = x2; x <= x1; x++) {
-          let y = Math.round(y1 + dy * (x - x1) / dx)
-
-          let index = 4 * (this.canvas.width * y + x);
-
-          var cArray = color.substring(4, color.length - 1).split(',')
-          this.pixelImageData.data[index] = cArray[0];
-          this.pixelImageData.data[index + 1] = cArray[1];
-          this.pixelImageData.data[index + 2] = cArray[2];
-          this.pixelImageData.data[index + 3] = 255;
-      }*/
-
-  let dx = Math.abs(x1 - x0);
-  let dy = Math.abs(y1 - y0);
-  let sx = (x0 < x1) ? 1 : -1;
-  let sy = (y0 < y1) ? 1 : -1;
-  let err = dx - dy;
+  const dx = Math.abs(x1 - x0);
+  const sx = x0 < x1 ? 1 : -1;
+  const dy = -Math.abs(y1 - y0);
+  const sy = y0 < y1 ? 1 : -1;
+  let error = dx + dy;
 
   while (true) {
     insertPixel(x0, y0);
-
-    if ((x0 === x1) && (y0 === y1)) break;
-    let e2 = 2 * err;
-    if (e2 > -dy) { err -= dy; x0 += sx; }
-    if (e2 < dx) { err += dx; y0 += sy; }
+    const e2 = 2 * error;
+    if (e2 >= dy) {
+      if (x0 == x1) break;
+      error += dy;
+      x0 += sx;
+    }
+    if (e2 <= dx) {
+      if (y0 == y1) break;
+      error += dx;
+      y0 += sy;
+    }
   }
 }
 
@@ -455,8 +392,8 @@ const changeMousePos = (e) => {
   // console.log(e)
   // console.log("client:", e.clientX, e.clientY)
   // console.log("screen:", e.screenX, e.screenY)
-  const oldX = cursorX;
-  const oldY = cursorY;
+  const oldPixelX = currentPixelX;
+  const oldPixelY = currentPixelY;
 
   const rect = canvasEl.parentElement.getBoundingClientRect();
 
@@ -468,9 +405,16 @@ const changeMousePos = (e) => {
 
   mouseInCanvas = (currentPixelX >= 0 && currentPixelX < canvasSizeX) && (currentPixelY >= 0 && currentPixelY < canvasSizeY)
 
-  if (mouseDown && mouseInFrame) {
-    //drawLine(oldX, oldY, cursorX, cursorY);
-    drawPixel();
+  console.log(currentPixelX, currentPixelY)
+
+  if (mouseDown) {
+    if (!(oldPixelX === currentPixelX && oldPixelY === currentPixelY)
+      && (Math.abs(oldPixelX - currentPixelX) + Math.abs(oldPixelY - currentPixelY)) > 1) {
+      console.log("draw pixel")
+      drawLine(oldPixelX, oldPixelY, currentPixelX, currentPixelY);
+    } else {
+      drawPixel();
+    }
   }
 
   //console.log(mouseX - (displayWidth / 2), mouseY - (displayHeight / 2));
