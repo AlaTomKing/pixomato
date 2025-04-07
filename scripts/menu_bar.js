@@ -8,7 +8,7 @@ const menuList = []
 
 const menuCtx = {
     file: [
-        {
+        /*{
             type: "tree",
             label: "New",
             list: [
@@ -24,10 +24,11 @@ const menuCtx = {
         },
         {
             type: "separator"
-        },
+        },*/
         {
             type: "button",
             label: "Save",
+            disabled: "true",
             shortcut: {
                 win: "Ctrl+S",
                 mac: "Meta+S",
@@ -36,6 +37,7 @@ const menuCtx = {
         {
             type: "button",
             label: "Save as...",
+            disabled: "true",
             shortcut: {
                 win: "Ctrl+Shift+S",
                 mac: "Meta+Shift+S"
@@ -47,10 +49,13 @@ const menuCtx = {
         {
             type: "button",
             label: "Import PNG...",
+            func: () => { import_img("png") }
         },
         {
             type: "button",
-            label: "Import QOI..."
+            label: "Import QOI...",
+            disabled: "true",
+            func: () => { import_img("qoi") }
         },
         {
             type: "separator"
@@ -61,11 +66,19 @@ const menuCtx = {
             shortcut: {
                 win: "Ctrl+Shift+E",
                 mac: "Meta+Shift+E",
+            },
+            func: () => {
+                encode_png(pixels, {
+                    width: canvasSizeX,
+                    height: canvasSizeY,
+                    channels: channels,
+                });
             }
         },
         {
             type: "button",
             label: "Export QOI...",
+            disabled: "true",
             func: () => {
                 encode_qoi(pixels, {
                     width: canvasSizeX,
@@ -80,16 +93,19 @@ const menuCtx = {
         },
         {
             type: "button",
+            disabled: "true",
             label: "Project settings"
         },
         {
             type: "button",
+            disabled: "true",
             label: "Preferences"
         }
     ],
     edit: [
         {
             type: "button",
+            disabled: "true",
             label: "Redo",
             shortcut: {
                 win: "Ctrl+Z",
@@ -98,6 +114,7 @@ const menuCtx = {
         },
         {
             type: "button",
+            disabled: "true",
             label: "Undo",
             shortcut: {
                 win: "Ctrl+Y",
@@ -109,6 +126,7 @@ const menuCtx = {
         },
         {
             type: "button",
+            disabled: "true",
             label: "Cut",
             shortcut: {
                 win: "Ctrl+X",
@@ -117,6 +135,7 @@ const menuCtx = {
         },
         {
             type: "button",
+            disabled: "true",
             label: "Copy",
             shortcut: {
                 win: "Ctrl+C",
@@ -125,6 +144,7 @@ const menuCtx = {
         },
         {
             type: "button",
+            disabled: "true",
             label: "Paste",
             shortcut: {
                 win: "Ctrl+V",
@@ -135,6 +155,7 @@ const menuCtx = {
     select: [
         {
             type: "button",
+            disabled: "true",
             label: "Select all",
             shortcut: {
                 win: "Ctrl+A",
@@ -145,6 +166,7 @@ const menuCtx = {
     view: [
         {
             type: "button",
+            disabled: "true",
             label: "Timeline",
             shortcut: {
                 win: "Ctrl+F1",
@@ -153,6 +175,7 @@ const menuCtx = {
         },
         {
             type: "button",
+            disabled: "true",
             label: "Tools",
             shortcut: {
                 win: "Ctrl+F2",
@@ -161,6 +184,7 @@ const menuCtx = {
         },
         {
             type: "button",
+            disabled: "true",
             label: "Properties",
             shortcut: {
                 win: "Ctrl+F3",
@@ -169,6 +193,7 @@ const menuCtx = {
         },
         {
             type: "button",
+            disabled: "true",
             label: "Layer",
             shortcut: {
                 win: "Ctrl+F4",
@@ -203,6 +228,7 @@ const menuCtx = {
         },
         {
             type: "button",
+            disabled: "true",
             label: "About Pixomato"
         }
     ]

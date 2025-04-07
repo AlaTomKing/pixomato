@@ -38,8 +38,8 @@ const rectSize = 10;
 
 let cursorX, cursorY = 0;
 
-let canvasSizeX = 36;
-let canvasSizeY = 24;
+let canvasSizeX = 18 //36;
+let canvasSizeY = 12 //24;
 let channels = 3; // 3: RGB, 4: RGBA
 
 let pixels = new Uint8Array(canvasSizeX * canvasSizeY * channels).fill(255);
@@ -405,12 +405,9 @@ const changeMousePos = (e) => {
 
   mouseInCanvas = (currentPixelX >= 0 && currentPixelX < canvasSizeX) && (currentPixelY >= 0 && currentPixelY < canvasSizeY)
 
-  console.log(currentPixelX, currentPixelY)
-
   if (mouseDown) {
     if (!(oldPixelX === currentPixelX && oldPixelY === currentPixelY)
       && (Math.abs(oldPixelX - currentPixelX) + Math.abs(oldPixelY - currentPixelY)) > 1) {
-      console.log("draw pixel")
       drawLine(oldPixelX, oldPixelY, currentPixelX, currentPixelY);
     } else {
       drawPixel();
@@ -423,7 +420,9 @@ const changeMousePos = (e) => {
 
   //console.log(currentPixelX, currentPixelY)
 
-  render();
+  if (mouseInFrame) {
+    render();
+  }
 }
 
 const wheel = (e) => {
@@ -510,10 +509,9 @@ const mousedown = (e) => {
     //if (mouseInCanvas) {
     if (mouseInFrame) {
       drawPixel();
+      render();
     }
     //}
-
-    render();
   }
 }
 
@@ -530,7 +528,7 @@ window.addEventListener("load", () => {
     ctx.imageSmoothingEnabled = false;
 
     // window.addEventListener("resize", resize);
-    window.addEventListener("mouseout", mouseout);
+    // window.addEventListener("mouseout", mouseout);
 
     document.addEventListener("pointerdown", mousedown);
     document.addEventListener("pointerup", mouseup);
@@ -563,7 +561,13 @@ window.addEventListener("load", () => {
       }
     }*/
     
-    console.log(pixels.length);
+    let idx = 0;
+    for (let i = 0; i < canvasSizeX * canvasSizeY * channels; i += channels) {
+      pixels[i] = idx * 32;
+      pixels[i+1] = idx * 64;
+      pixels[i + 2] = idx * 16;
+      idx++;
+    }
 
     render();
     resize();
