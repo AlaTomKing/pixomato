@@ -53,7 +53,8 @@ const eval = (list) => {
                     const lfi = document.createElement("div");
                     const rti = document.createElement("div");
                     const inn = document.createElement("div");
-                    btn.className = "context-menu-button";
+                    if (e.disabled === "true") btn.className = "context-menu-button-disabled";
+                    else btn.className = "context-menu-button";
                     inn.className = "context-menu-button-inner";
                     shc.className = "context-menu-button-shortcuts";
                     lfi.className = "context-menu-button-left-icon";
@@ -61,7 +62,7 @@ const eval = (list) => {
                     lbl.className = "context-menu-button-label";
                     lbl.innerHTML = e.label;
                     shc.innerHTML = e.shortcut?.win
-                    if (e.func) btn.addEventListener("click", () => { e.func(); closeCtxMenu(); });
+                    if (e.func && e.disabled !== "true") btn.addEventListener("click", () => { e.func(); closeCtxMenu(); });
                     inn.appendChild(lfi);
                     inn.appendChild(lbl);
                     inn.appendChild(rti);

@@ -29,6 +29,7 @@
 
     :root {
         --text-color: rgb(255, 255, 255);
+        --text-disabled-color: rgb(153,153,153);
         --background-color: rgb(49, 49, 49);
         --topbar-color: rgb(64, 64, 64);
         --topbar-btn-hover-color: rgb(85, 85, 85);
@@ -44,6 +45,7 @@
 @media (prefers-color-scheme: light) {
     :root {
         --text-color: rgb(0,0,0);
+        --text-disabled-color: rgb(102,102,102);
         --background-color: rgb(160,160,160);
         --topbar-color: rgb(185, 185, 185);
         --topbar-btn-hover-color: rgb(160, 160, 160);
@@ -365,11 +367,11 @@ button:hover:active {
     font-size: var(--ctx-menu-font-size);
 }
 
-.context-menu-button {
+.context-menu-button, .context-menu-button-disabled {
     height: 22px;
 }
 
-.context-menu-button > .context-menu-button-inner {
+.context-menu-button > .context-menu-button-inner, .context-menu-button-disabled > .context-menu-button-inner {
     height: 22px;
     margin-inline: 3px;
 }
@@ -411,6 +413,10 @@ button:hover:active {
 .context-menu-button:hover > .context-menu-button-inner {
     border-radius: 3px;
     background-color: var(--context-menu-button-color);
+}
+
+.context-menu-button-disabled {
+    color: var(--text-disabled-color);
 }
 
 .context-menu-separator {
