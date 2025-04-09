@@ -99,6 +99,10 @@ const update_crc = (crc, data) => {
     return crc;
 }
 
+const comp_bytes = (x0, x1, x2, x3, y0, y1, y2, y3) => {
+    return x0 == y0 && x1 == y1 && x2 == y2 && x3 == y3;
+}
+
 const calc_crc_32 = (data) => {
     const out = update_crc(0xffffffff, data);
     return out ^ 0xffffffff;
@@ -225,7 +229,7 @@ const encode_png = (data, desc) => {
 
     pixels = temp;
 
-    // SECOND PHASE: LEMPEL-ZIV SCHEMES (LZSS) ENCODING
+    // SECOND PHASE: LEMPEL-ZIV 77 (LZ77) ENCODING
 
     // THIRD PHASE: HUFFMAN ENCODING
 }
@@ -258,24 +262,23 @@ const decode_png = (buffer) => {
             return -1;
         }
 
-        const type1 = bytes[p++];
-        const type2 = bytes[p++];
-        const type3 = bytes[p++];
-        const type4 = bytes[p++];
+        const t_1 = bytes[p++];
+        const t_2 = bytes[p++];
+        const t_3 = bytes[p++];
+        const t_4 = bytes[p++];
 
-        console.log("TYPE: ", String.fromCharCode(type1), String.fromCharCode(type2), String.fromCharCode(type3), String.fromCharCode(type4), type1.toString(16), type2.toString(16), type3.toString(16), type4.toString(16));
+        console.log("LENGTH: ", length, "TYPE: ", String.fromCharCode(t_1), String.fromCharCode(t_2), String.fromCharCode(t_3), String.fromCharCode(t_4), t_1.toString(16), t_2.toString(16), t_3.toString(16), t_4.toString(16));
 
         let crc_idx = 0
         let crc_input = new Uint8Array(4 + length);
         //let crc_input = [];
-        crc_input[crc_idx++] = type1;
-        crc_input[crc_idx++] = type2;
-        crc_input[crc_idx++] = type3;
-        crc_input[crc_idx++] = type4;
+        crc_input[crc_idx++] = t_1;
+        crc_input[crc_idx++] = t_2;
+        crc_input[crc_idx++] = t_3;
+        crc_input[crc_idx++] = t_4;
 
         for (let i = 0; i < length; i++) {
             crc_input[crc_idx++] = bytes[p++];
-            //console.log(bytes[p++]);
         }
 
         const crc = bytes[p++] << 24 | bytes[p++] << 16 | bytes[p++] << 8 | bytes[p++];
@@ -286,36 +289,58 @@ const decode_png = (buffer) => {
             console.log("yeah the file gotta be corrupted or something");
             return -1;
         };
-    }
 
-    /*const length = bytes[p++] << 24 | bytes[p++] << 16 | bytes[p++] << 8 | bytes[p++];
+        let i = 4;
+        if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x48, 0x44, 0x52)) { // IHDR
+            const width = (crc_input[i++] << 24 | crc_input[i++] << 16 | crc_input[i++] << 8 | crc_input[i++]) >>> 0;
+            const height = (crc_input[i++] << 24 | crc_input[i++] << 16 | crc_input[i++] << 8 | crc_input[i++]) >>> 0;
+            const bit_depth = crc_input[i++];
+            const color_type = crc_input[i++];
+            const compression = crc_input[i++];
+            const filter = crc_input[i++];
+            const interlace = crc_input[i++];
 
-    const type1 = bytes[p++];
-    const type2 = bytes[p++];
-    const type3 = bytes[p++];
-    const type4 = bytes[p++];
-
-    // IHDR (must be the start of the chunk thing)
-    if (type1 === 0x49 &&
-        type2 === 0x48 &&
-        type3 === 0x44 &&
-        type4 === 0x52
-    ) {
-        for (let i = 0; i < length; i++) {
-            console.log(bytes[p++]);
+            console.log(width, height,bit_depth,color_type,compression,filter,interlace)
+        } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x50, 0x4C, 0x54, 0x45)) { // PLTE
+            console.log("PLTE")
+        } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x44, 0x41, 0x54)) { // IDAT
+            console.log("IDAT");
+            let i = 0;
+            const data = new Uint8Array(crc_input.buffer, 0, length)
+            const zlib_flag_code = data[i++]; // compression method (1 byte)
+            const zlib_check_bits = data[i++]; // additional flags (1 byte)
+            const zlib_data = new Uint8Array(data, 2, length - 4);
+            i += length - 6;
+            const zlib_check_val = (data[i++] << 24 | data[i++] << 16 | data[i++] << 8 | data[i++]) >>> 0;
+            
+            console.log(data);
+            console.log(zlib_flag_code);
+            console.log(zlib_check_bits);
+            console.log(zlib_data);
+            console.log(zlib_check_val);
+            /*let j = 0;
+            let temp = new Uint8Array(pixels);
+            while (i < 4 + length) {
+                pixels[j++] = crc_input[i++];
+            }
+            render();
+            pixels = temp;*/
+        } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x45, 0x4E, 0x44)) { // IEND
+            console.log("IEND")
+        } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x74, 0x45, 0x58, 0x74)) { //tEXt
+            console.log("tEXt")
+            const data = new Uint8Array(crc_input.buffer, 4, length);
+            let out = "";
+            for (let i = 0; i < data.length; i++) {
+                out += String.fromCharCode(data[i]);
+            }
+            console.log(out);
         }
-    } else {
-        console.error("yeah the file gotta be corrupted or something");
-        return -1;
     }
-
-    // IEND (must be the end of the chunk thing)
-
-    console.log("length", length);*/
 
     // FIRST PHASE: HUFFMAN DECODING
 
-    // SECOND PHASE: LEMPEL-ZIV SCHEMES (LZSS) DECODING
+    // SECOND PHASE: LEMPEL-ZIV 77 (LZ77) DECODING
 
     // THIRD PHASE: REVERSE FILTERING
 }
