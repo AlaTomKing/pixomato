@@ -561,13 +561,13 @@ window.addEventListener("load", () => {
       }
     }*/
     
-    let idx = 0;
+    /*let idx = 0;
     for (let i = 0; i < canvasSizeX * canvasSizeY * channels; i += channels) {
       pixels[i] = idx * 32;
       pixels[i+1] = idx * 64;
       pixels[i + 2] = idx * 16;
       idx++;
-    }
+    }*/
 
     render();
     resize();

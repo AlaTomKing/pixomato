@@ -77,6 +77,17 @@ const menuCtx = {
         },
         {
             type: "button",
+            label: "export png upscaled 4 times...",
+            func: () => {
+                encode_png(pixels, {
+                    width: canvasSizeX,
+                    height: canvasSizeY,
+                    channels: channels,
+                });
+            }
+        },
+        {
+            type: "button",
             label: "Export QOI...",
             disabled: "true",
             func: () => {
