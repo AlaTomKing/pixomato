@@ -306,11 +306,13 @@ const decode_png = (buffer) => {
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x44, 0x41, 0x54)) { // IDAT
             console.log("IDAT");
             let i = 0;
-            const data = new Uint8Array(crc_input.buffer, 0, length)
+            const data = new Uint8Array(crc_input.buffer, 4, length)
             const zlib_flag_code = data[i++]; // compression method (1 byte)
             const zlib_check_bits = data[i++]; // additional flags (1 byte)
-            const zlib_data = new Uint8Array(data, 2, length - 4);
-            i += length - 6;
+            const zlib_data = new Uint8Array(data.length - 6);
+            while (i < data.length - 4) {
+                zlib_data[i - 2] = data[i++];
+            }
             const zlib_check_val = (data[i++] << 24 | data[i++] << 16 | data[i++] << 8 | data[i++]) >>> 0;
             
             console.log(data);
