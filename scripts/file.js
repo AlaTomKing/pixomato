@@ -304,7 +304,6 @@ const decode_png = (buffer) => {
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x50, 0x4C, 0x54, 0x45)) { // PLTE
             console.log("PLTE")
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x44, 0x41, 0x54)) { // IDAT
-            console.log("IDAT");
             let i = 0;
             const data = new Uint8Array(crc_input.buffer, 4, length)
             const zlib_flag_code = data[i++]; // compression method (1 byte)
