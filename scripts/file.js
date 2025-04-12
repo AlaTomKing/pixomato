@@ -309,9 +309,7 @@ const decode_png = (buffer) => {
             const zlib_flag_code = data[i++]; // compression method (1 byte)
             const zlib_check_bits = data[i++]; // additional flags (1 byte)
             const zlib_data = new Uint8Array(data.length - 6);
-            while (i < data.length - 4) {
-                zlib_data[i - 2] = data[i++];
-            }
+            while (i < data.length - 4) { zlib_data[i - 2] = data[i++]; }
             const zlib_check_val = (data[i++] << 24 | data[i++] << 16 | data[i++] << 8 | data[i++]) >>> 0;
             
             console.log(data);
