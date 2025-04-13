@@ -252,6 +252,9 @@ const decode_png = (buffer) => {
         return -1;
     }
 
+    // IHDR PROPERTIES (IMPORTANT!!!)
+    let width, height, bit_depth, color_type, compression, filter, interlace
+
     // chunkz
     while (p < bytes.length) {
         const length = (bytes[p++] << 24 | bytes[p++] << 16 | bytes[p++] << 8 | bytes[p++]) >>> 0;
@@ -289,9 +292,6 @@ const decode_png = (buffer) => {
             return -1;
         };
 
-        // IHDR PROPERTIES (IMPORTANT!!!)
-        let width, height, bit_depth, color_type, compression, filter, interlace
-
         let i = 4;
         if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x48, 0x44, 0x52)) { // IHDR
             width = (crc_input[i++] << 24 | crc_input[i++] << 16 | crc_input[i++] << 8 | crc_input[i++]) >>> 0;
@@ -307,12 +307,13 @@ const decode_png = (buffer) => {
             const data = new Uint8Array(crc_input.buffer, 4, length)
             console.log("PLTE", data)
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x44, 0x41, 0x54)) { // IDAT
+            console.log(compression)
             if (compression !== 0) {
                 console.log("yeah i dont know any other png compression method other than 0. other methods coming soon!")
                 return -1;
             }
 
-            // it would take me too long to write a zlib inflate/deflate script
+            // this zlib deflate/inflate script is based off the puff.c script by Mark Adler
 
             // deflate buffer with a 32 kibibyte window
             const deflate_buf = new Uint8Array(32768);
@@ -335,6 +336,7 @@ const decode_png = (buffer) => {
             console.log(zlib_check_bits);
             console.log(zlib_data);
             console.log(zlib_check_val);
+
             let j = 0;
             let temp = new Uint8Array(pixels);
             while (i < 4 + length) {
