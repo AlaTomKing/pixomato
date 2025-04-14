@@ -1,7 +1,7 @@
-// This encoder is based off the Quite OK Image format by Dominic Szablewski.
-
 // #region "QUITE OKAY IMAGE" PICTURE FORMAT
 const encode_qoi = (data, desc) => {
+    // This encoder is based off the Quite OK Image format by Dominic Szablewski.
+
     // What a description should contain:
 
     /**
@@ -337,14 +337,19 @@ const decode_png = (buffer) => {
             console.log(zlib_data);
             console.log(zlib_check_val);
 
-            let j = 0;
+            let out = {}
+            let outlen
+            puff(out, outlen, zlib_data, zlib_data.length);
+            console.log(out)
+
+            /*let j = 0;
             let temp = new Uint8Array(pixels);
             while (i < 4 + length) {
                 pixels[j++] = crc_input[i++];
             }
             render();
             pixels = temp;
-            pixels = temp
+            pixels = temp*/
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x45, 0x4E, 0x44)) { // IEND
             console.log("IEND")
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x74, 0x45, 0x58, 0x74)) { //tEXt
@@ -406,3 +411,5 @@ const import_img = (type) => {
 
     input.click();
 }
+
+decode_png(test_png_data)
