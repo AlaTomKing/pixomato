@@ -69,6 +69,7 @@ const crc_table = new Uint32Array(256);
 let crc_table_computed = false;
 
 const make_crc_table = () => {
+    let c;
     let n, k;
     for (n = 0; n < 256; n++) {
         c = n;
@@ -103,6 +104,16 @@ const comp_bytes = (x0, x1, x2, x3, y0, y1, y2, y3) => {
 const calc_crc_32 = (data) => {
     const out = update_crc(0xffffffff, data);
     return out ^ 0xffffffff;
+}
+
+const paeth_predictor = (up, left, up_left) => {
+    const v = up + left - up_left;
+    const v_l = Math.abs(v - left);
+    const v_u = Math.abs(v - up);
+    const v_ul = Math.abs(v - up_left);
+    if (v_l <= v_u && v_l <= v_ul) return left;
+    else if (v_u <= v_ul) return up;
+    else return up_left;
 }
 
 const encode_png = (data, desc) => {
@@ -166,7 +177,7 @@ const encode_png = (data, desc) => {
 
             sub_row[idx] = data[x] - left; // SUB
             up_row[idx] = data[x] - up; // UP
-            avg_row[idx] = Math.floor(data[x] - (up + left) / 2); // AVG
+            avg_row[idx] = data[x] - Math.floor((up + left) / 2); // AVG
 
             // PAETH
             const v = up + left - up_left;
@@ -255,6 +266,9 @@ const decode_png = (buffer) => {
     // IHDR PROPERTIES (IMPORTANT!!!)
     let width, height, bit_depth, color_type, compression, filter, interlace
 
+    // PLTE (if exists)
+    let palette
+
     // chunkz
     while (p < bytes.length) {
         const length = (bytes[p++] << 24 | bytes[p++] << 16 | bytes[p++] << 8 | bytes[p++]) >>> 0;
@@ -302,10 +316,29 @@ const decode_png = (buffer) => {
             filter = crc_input[i++];
             interlace = crc_input[i++];
 
-            console.log(width, height,bit_depth,color_type,compression,filter,interlace)
+            switch (color_type) {
+                case 0:
+                    console.log("COLOR TYPE GREYSCALE");
+                    break;
+                case 2:
+                    console.log("COLOR TYPE TRUECOLOR");
+                    break;
+                case 3:
+                    console.log("COLOR TYPE INDEXED");
+                    break;
+                case 4:
+                    console.log("COLOR TYPE GREYSCALE WITH ALPHA");
+                    break;
+                case 6:
+                    console.log("COLOR TYPE TRUECOLOR WITH ALPHA");
+                    break;
+            }
+
+            console.log(width, height, bit_depth, color_type, compression, filter, interlace)
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x50, 0x4C, 0x54, 0x45)) { // PLTE
-            const data = new Uint8Array(crc_input.buffer, 4, length)
-            console.log("PLTE", data)
+            const data = new Uint8Array(crc_input.buffer, 4, length);
+            palette = data;
+            console.log("PLTE", data);
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x44, 0x41, 0x54)) { // IDAT
             console.log(compression)
             if (compression !== 0) {
@@ -320,36 +353,112 @@ const decode_png = (buffer) => {
 
             let i = 0;
             const data = new Uint8Array(crc_input.buffer, 4, length)
-            const zlib_flag_code = data[i++]; // compression method (1 byte)
-            const zlib_check_bits = data[i++]; // additional flags (1 byte)
-            const zlib_data = new Uint8Array(data.length - 6);
-            while (i < data.length - 4) { zlib_data[i - 2] = data[i++]; }
-            const zlib_check_val = (data[i++] << 24 | data[i++] << 16 | data[i++] << 8 | data[i++]) >>> 0;
+            // const zlib_flag_code = data[i++]; // compression method (1 byte)
+            // const zlib_check_bits = data[i++]; // additional flags (1 byte)
+            // const zlib_data = new Uint8Array(data.length - 6);
+            // while (i < data.length - 4) { zlib_data[i - 2] = data[i++]; }
+            // const zlib_check_val = (data[i++] << 24 | data[i++] << 16 | data[i++] << 8 | data[i++]) >>> 0;
 
             // if (zlib_flag_code != 8) {
             //     console.log("yeah i dont know any other zlib compression method other than 0. other methods coming soon!")
             //     return -1;
             // }
-            
+
             console.log(data);
-            console.log(zlib_flag_code);
-            console.log(zlib_check_bits);
-            console.log(zlib_data);
-            console.log(zlib_check_val);
+            // console.log(zlib_flag_code);
+            // console.log(zlib_check_bits);
+            // console.log(zlib_data);
+            // console.log(zlib_check_val);
 
-            let out = {}
-            let outlen
-            puff(out, outlen, zlib_data, zlib_data.length);
-            console.log(out)
+            let deflate = new Zlib.Inflate(data);
+            let out = deflate.decompress();
+            console.log("DECOMPRESS", out);
 
-            /*let j = 0;
-            let temp = new Uint8Array(pixels);
-            while (i < 4 + length) {
-                pixels[j++] = crc_input[i++];
+            let out1_idx = 0;
+            let out1 = new Uint8Array(width * height * 3);
+
+            if (color_type === 2 && bit_depth === 8) {
+                const scanline_length = (width * 3 + 1);
+                const pixel_length = (width * 3);
+
+                for (let y = 0; y < height; y++) {
+                    const filter_type = out[y * scanline_length];
+                    switch (filter_type) { // NONE
+                        case 0:
+                            console.log("NONE");
+                            for (let x = 0; x < pixel_length; x += 3) {
+                                out1[out1_idx++] = out[y * scanline_length + x + 1]; // R
+                                out1[out1_idx++] = out[y * scanline_length + x + 2]; // G
+                                out1[out1_idx++] = out[y * scanline_length + x + 3]; // B
+                            }
+                            break;
+                        case 1: // SUB
+                            console.log("SUB");
+                            for (let x = 0; x < pixel_length; x += 3) {
+                                const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
+                                const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
+                                const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
+                                out1[out1_idx++] = out[y * scanline_length + x + 1] + left_r; // R
+                                out1[out1_idx++] = out[y * scanline_length + x + 2] + left_g; // G
+                                out1[out1_idx++] = out[y * scanline_length + x + 3] + left_b; // B
+                            }
+                            break;
+                        case 2: // UP
+                            console.log("UP");
+                            for (let x = 0; x < pixel_length; x += 3) {
+                                const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
+                                const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
+                                const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
+                                out1[out1_idx++] = out[y * scanline_length + x + 1] + up_r; // R
+                                out1[out1_idx++] = out[y * scanline_length + x + 2] + up_g; // G
+                                out1[out1_idx++] = out[y * scanline_length + x + 3] + up_b; // B
+                            }
+                            break;
+                        case 3: // AVG
+                            console.log("AVG");
+                            for (let x = 0; x < pixel_length; x += 3) {
+                                const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
+                                const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
+                                const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
+                                const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
+                                const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
+                                const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
+                                out1[out1_idx++] = out[y * scanline_length + x + 1] + Math.floor((up_r + left_r) / 2) // R
+                                out1[out1_idx++] = out[y * scanline_length + x + 2] + Math.floor((up_g + left_g) / 2) // G
+                                out1[out1_idx++] = out[y * scanline_length + x + 3] + Math.floor((up_b + left_b) / 2) // B
+                            }
+                            break;
+                        case 4: // PAETH
+                            console.log("PAETH");
+                            for (let x = 0; x < pixel_length; x += 3) {
+                                const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
+                                const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
+                                const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
+                                const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
+                                const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
+                                const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
+                                const up_left_r = (((y - 1) >= 0) && ((x - 3) >= 0)) ? out1[(y - 1) * pixel_length + x - 3] : 0; // R
+                                const up_left_g = (((y - 1) >= 0) && ((x - 2) >= 0)) ? out1[(y - 1) * pixel_length + x - 2] : 0; // G
+                                const up_left_b = (((y - 1) >= 0) && ((x - 1) >= 0)) ? out1[(y - 1) * pixel_length + x - 1] : 0; // B
+                                out1[out1_idx++] = out[y * scanline_length + x + 1] + paeth_predictor(up_r, left_r, up_left_r); // R
+                                out1[out1_idx++] = out[y * scanline_length + x + 2] + paeth_predictor(up_g, left_g, up_left_g); // G
+                                out1[out1_idx++] = out[y * scanline_length + x + 3] + paeth_predictor(up_b, left_b, up_left_b); // B
+                            }
+                            break;
+                    }
+                }
             }
-            render();
-            pixels = temp;
-            pixels = temp*/
+
+            canvasSizeX = width;
+            canvasSizeY = height;
+
+            pixels = out1;
+
+            /*const temp = new Uint8Array(pixels);
+            for (let i = 0; i < out1.length; i++) {
+                pixels[i] = out1[i];
+            }
+            render();*/
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x45, 0x4E, 0x44)) { // IEND
             console.log("IEND")
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x74, 0x45, 0x58, 0x74)) { //tEXt
@@ -412,4 +521,4 @@ const import_img = (type) => {
     input.click();
 }
 
-decode_png(test_png_data)
+//decode_png(test_png_data)
