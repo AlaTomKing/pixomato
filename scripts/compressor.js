@@ -452,7 +452,19 @@ const decode_png = (buffer) => {
             canvasSizeX = width;
             canvasSizeY = height;
 
-            pixels = out1;
+            /*imageData = new ImageData(width, height);
+            pixels = new Uint8Array(imageData.data.buffer);
+
+            scaler.width = width;
+            scaler.height = height;*/
+
+            let offset = 0;
+            for (let x = 0; x < out1.length; x += 3) {
+                pixels[x + offset] = out1[x];
+                pixels[x + 1 + offset] = out1[x + 1];
+                pixels[x + 2 + offset] = out1[x + 2];
+                offset++;
+            }
 
             /*const temp = new Uint8Array(pixels);
             for (let i = 0; i < out1.length; i++) {
