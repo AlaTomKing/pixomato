@@ -38,11 +38,19 @@ const rectSize = 10;
 
 let cursorX, cursorY = 0;
 
-let canvasSizeX = 16 //36;
-let canvasSizeY = 16 //24;
-let channels = 3; // 3: RGB, 4: RGBA
+let canvasSizeX = 256 //36;
+let canvasSizeY = 256 //24;
+let channels = 4; // 3: RGB, 4: RGBA
 
-let pixels = new Uint8Array(canvasSizeX * canvasSizeY * channels).fill(255);
+let imageData = new ImageData(canvasSizeX, canvasSizeY);
+//let pixels1 = new Uint8Array(imageData.data.buffer).fill(127);
+let pixels = new Uint8Array(imageData.data.buffer).fill(255);
+
+const scaler = document.createElement("canvas");
+scaler.width = canvasSizeX;
+scaler.height = canvasSizeY;
+const scalerCtx = scaler.getContext("2d");
+
 let outsidePixels = {};
 
 let currentPixelX = 0;
@@ -92,6 +100,10 @@ const setRGBStroke = (r, g, b, a = 1) => {
   ctx.strokeStyle = `rgba(${r},${g},${b},${a})`;
 }
 
+const addImage = (img, x, y, w, h) => {
+  ctx.drawImage(img, x * res, y * res, w * res, h * res);
+}
+
 const fillRect = (x, y, w, h) => {
   ctx.fillRect(x * res, y * res, w * res, h * res);
 }
@@ -133,6 +145,8 @@ const render = () => {
 
   ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
 
+  ctx.imageSmoothingEnabled = false;
+
   // MAIN FRAME
   //ctx.globalAlpha = 0.4
   const canvasPosX = Math.floor(((displayWidth / 2) - (canvasSizeX * zoom / 2) - posX) * res) / res
@@ -152,7 +166,7 @@ const render = () => {
 
   ctx.shadowColor = "transparent"
 
-  for (let i = 0; i < pixels.length; i += channels) {
+  /*for (let i = 0; i < pixels.length; i += channels) {
     let pixelX = (i / channels) % canvasSizeX;
     let pixelY = Math.floor((i / channels) / canvasSizeX);
 
@@ -171,7 +185,11 @@ const render = () => {
       Math.round(zoom),
       Math.round(zoom)
     )*/
-  }
+  //}
+
+  scalerCtx.putImageData(imageData, 0, 0);
+
+  addImage(scaler, canvasPosX, canvasPosY, canvasWidth, canvasHeight);
 
   for (const [key, color] of Object.entries(outsidePixels)) {
     let [pixelX, pixelY] = key.split(":");
@@ -552,8 +570,6 @@ window.addEventListener("load", () => {
       mouseInFrame = ((cursorX >= 0 && cursorX < displayWidth) && (cursorY >= 0 && cursorY < displayHeight)) && mouseHover
       render();
     })
-
-    image.addEventListener("load", render)
 
     /*for (let i = 0; i < canvasSizeX; i++) {
       for (let j = 0; j < canvasSizeY; j++) {
