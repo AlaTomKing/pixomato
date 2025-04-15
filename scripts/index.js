@@ -38,8 +38,8 @@ const rectSize = 10;
 
 let cursorX, cursorY = 0;
 
-let canvasSizeX = 18 //36;
-let canvasSizeY = 12 //24;
+let canvasSizeX = 16 //36;
+let canvasSizeY = 16 //24;
 let channels = 3; // 3: RGB, 4: RGBA
 
 let pixels = new Uint8Array(canvasSizeX * canvasSizeY * channels).fill(255);

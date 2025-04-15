@@ -161,6 +161,19 @@ const menuCtx = {
                 win: "Ctrl+V",
                 mac: "Meta+V",
             }
+        },
+        {
+            type: "separator"
+        },
+        {
+            type: "button",
+            label: "clear canvas",
+            func: () => {
+                for (let i = 0; i < pixels.length; i++) {
+                    pixels[i] = 255;
+                }
+                render();
+            }
         }
     ],
     select: [
