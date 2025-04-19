@@ -38,8 +38,9 @@ const rectSize = 10;
 
 let cursorX, cursorY = 0;
 
-let canvasSizeX = 256 //36;
-let canvasSizeY = 256 //24;
+let canvasSizeX = 128 //36;
+let canvasSizeY = 128 //24;
+
 let channels = 4; // 3: RGB, 4: RGBA
 
 let imageData = new ImageData(canvasSizeX, canvasSizeY);
@@ -49,6 +50,7 @@ let pixels = new Uint8Array(imageData.data.buffer).fill(255);
 const scaler = document.createElement("canvas");
 scaler.width = canvasSizeX;
 scaler.height = canvasSizeY;
+
 const scalerCtx = scaler.getContext("2d");
 
 let outsidePixels = {};
@@ -164,7 +166,7 @@ const render = () => {
 
   //ctx.globalAlpha = 1
 
-  ctx.shadowColor = "transparent"
+  ctx.shadowColor = "transparent";
 
   /*for (let i = 0; i < pixels.length; i += channels) {
     let pixelX = (i / channels) % canvasSizeX;
