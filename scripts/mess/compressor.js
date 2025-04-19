@@ -244,7 +244,7 @@ const encode_png = (data, desc) => {
     // THIRD PHASE: HUFFMAN ENCODING
 }
 
-const decode_png = (buffer) => {
+const decode_png = (file_name, buffer) => {
     // checking if this is a png file by the signature
     const bytes = new Uint8Array(buffer);
     let p = 0;
@@ -259,22 +259,25 @@ const decode_png = (buffer) => {
         bytes[p++] === 0x0A) {
         console.log(bytes);
     } else {
-        console.log("this is not a png file");
+        console.error(`(${file_name}): PNG_INVALID_FILE; "yeahhh the imported file is not png"`);
         return -1;
     }
 
     // IHDR PROPERTIES (IMPORTANT!!!)
-    let width, height, bit_depth, color_type, compression, filter, interlace
+    let width, height, bit_depth, color_type, compression, filter, interlace;
 
     // PLTE (if exists)
-    let palette
+    let palette;
+
+    // IDAT (pixomato only supports one chunk)
+    let idat_data;
 
     // chunkz
     while (p < bytes.length) {
         const length = (bytes[p++] << 24 | bytes[p++] << 16 | bytes[p++] << 8 | bytes[p++]) >>> 0;
 
         if (length > (0x7fffffff)) {
-            console.log("one chunk of png file has too much data");
+            console.error(`(${file_name}): PNG_OVER_CHUNK_SIZE_LIMIT; one chunk of imported png file has too much data`);
             return -1;
         }
 
@@ -283,7 +286,7 @@ const decode_png = (buffer) => {
         const t_3 = bytes[p++];
         const t_4 = bytes[p++];
 
-        console.log("LENGTH: ", length, "TYPE: ", String.fromCharCode(t_1), String.fromCharCode(t_2), String.fromCharCode(t_3), String.fromCharCode(t_4), t_1.toString(16), t_2.toString(16), t_3.toString(16), t_4.toString(16));
+        //console.log("LENGTH: ", length, "TYPE: ", String.fromCharCode(t_1), String.fromCharCode(t_2), String.fromCharCode(t_3), String.fromCharCode(t_4), t_1.toString(16), t_2.toString(16), t_3.toString(16), t_4.toString(16));
 
         let crc_idx = 0
         let crc_input = new Uint8Array(4 + length);
@@ -302,7 +305,7 @@ const decode_png = (buffer) => {
         //console.log(crc1 << 24 | crc2 << 16 | crc3 << 8 | crc4);
         //console.log(crc_input, crc1.toString(16), crc2.toString(16), crc3.toString(16), crc4.toString(16));
         if (calc_crc_32(crc_input) !== crc) {
-            console.log("yeah the file gotta be corrupted or something");
+            console.error(`(${file_name}): PNG_CRC_MISMATCH; "yeah the imported png file gotta be corrupted or something"`);
             return -1;
         };
 
@@ -315,6 +318,18 @@ const decode_png = (buffer) => {
             compression = crc_input[i++];
             filter = crc_input[i++];
             interlace = crc_input[i++];
+
+            switch (bit_depth) {
+                case 1: case 2: case 4: case 8:
+                    console.log(`bit depth: ${bit_depth}`)
+                    break;
+                case 16:
+                    console.error(`(${file_name}): PNG_UNSUPPORTED_BIT_DEPTH; "Pixomato does not support 16-bit color"`);
+                    return -1;
+                default:
+                    console.error(`(${file_name}): PNG_ILLEGAL_BIT_DEPTH; "the imported png file has an odd amount of bit depth. perhaps it's illegal?"`);
+                    return -1;
+            }
 
             switch (color_type) {
                 case 0:
@@ -334,161 +349,150 @@ const decode_png = (buffer) => {
                     break;
             }
 
+            if (width === 0 || height === 0) {
+                console.error("the imported png file has no width or height. are you trying to import nothing?")
+                return - 1;
+            }
+
             console.log(width, height, bit_depth, color_type, compression, filter, interlace)
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x50, 0x4C, 0x54, 0x45)) { // PLTE
+            if (color_type != 3) {
+                console.error(`(${file_name}): PNG_ILLEGAL_CHUNK; "the imported png file has a color palette, but the color type is not indexed"`);
+            }
+
             const data = new Uint8Array(crc_input.buffer, 4, length);
             palette = data;
-            console.log("PLTE", data);
+            // console.log("PLTE", data);
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x44, 0x41, 0x54)) { // IDAT
-            console.log(compression)
             if (compression !== 0) {
-                console.log("yeah i dont know any other png compression method other than 0. other methods coming soon!")
+                console.error("compression method other than 0 for the imported png file. other methods coming soon!")
                 return -1;
             }
-
-            // this zlib deflate/inflate script is based off the puff.c script by Mark Adler
-
-            // deflate buffer with a 32 kibibyte window
-            const deflate_buf = new Uint8Array(32768);
-
-            let i = 0;
-            const data = new Uint8Array(crc_input.buffer, 4, length)
-            // const zlib_flag_code = data[i++]; // compression method (1 byte)
-            // const zlib_check_bits = data[i++]; // additional flags (1 byte)
-            // const zlib_data = new Uint8Array(data.length - 6);
-            // while (i < data.length - 4) { zlib_data[i - 2] = data[i++]; }
-            // const zlib_check_val = (data[i++] << 24 | data[i++] << 16 | data[i++] << 8 | data[i++]) >>> 0;
-
-            // if (zlib_flag_code != 8) {
-            //     console.log("yeah i dont know any other zlib compression method other than 0. other methods coming soon!")
-            //     return -1;
-            // }
-
-            console.log(data);
-            // console.log(zlib_flag_code);
-            // console.log(zlib_check_bits);
-            // console.log(zlib_data);
-            // console.log(zlib_check_val);
-
-            let deflate = new Zlib.Inflate(data);
-            let out = deflate.decompress();
-            console.log("DECOMPRESS", out);
-
-            let out1_idx = 0;
-            let out1 = new Uint8Array(width * height * 3);
-
-            if (color_type === 2 && bit_depth === 8) {
-                const scanline_length = (width * 3 + 1);
-                const pixel_length = (width * 3);
-
-                for (let y = 0; y < height; y++) {
-                    const filter_type = out[y * scanline_length];
-                    switch (filter_type) { // NONE
-                        case 0:
-                            console.log("NONE");
-                            for (let x = 0; x < pixel_length; x += 3) {
-                                out1[out1_idx++] = out[y * scanline_length + x + 1]; // R
-                                out1[out1_idx++] = out[y * scanline_length + x + 2]; // G
-                                out1[out1_idx++] = out[y * scanline_length + x + 3]; // B
-                            }
-                            break;
-                        case 1: // SUB
-                            console.log("SUB");
-                            for (let x = 0; x < pixel_length; x += 3) {
-                                const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
-                                const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
-                                const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
-                                out1[out1_idx++] = out[y * scanline_length + x + 1] + left_r; // R
-                                out1[out1_idx++] = out[y * scanline_length + x + 2] + left_g; // G
-                                out1[out1_idx++] = out[y * scanline_length + x + 3] + left_b; // B
-                            }
-                            break;
-                        case 2: // UP
-                            console.log("UP");
-                            for (let x = 0; x < pixel_length; x += 3) {
-                                const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
-                                const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
-                                const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
-                                out1[out1_idx++] = out[y * scanline_length + x + 1] + up_r; // R
-                                out1[out1_idx++] = out[y * scanline_length + x + 2] + up_g; // G
-                                out1[out1_idx++] = out[y * scanline_length + x + 3] + up_b; // B
-                            }
-                            break;
-                        case 3: // AVG
-                            console.log("AVG");
-                            for (let x = 0; x < pixel_length; x += 3) {
-                                const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
-                                const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
-                                const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
-                                const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
-                                const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
-                                const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
-                                out1[out1_idx++] = out[y * scanline_length + x + 1] + Math.floor((up_r + left_r) / 2) // R
-                                out1[out1_idx++] = out[y * scanline_length + x + 2] + Math.floor((up_g + left_g) / 2) // G
-                                out1[out1_idx++] = out[y * scanline_length + x + 3] + Math.floor((up_b + left_b) / 2) // B
-                            }
-                            break;
-                        case 4: // PAETH
-                            console.log("PAETH");
-                            for (let x = 0; x < pixel_length; x += 3) {
-                                const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
-                                const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
-                                const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
-                                const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
-                                const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
-                                const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
-                                const up_left_r = (((y - 1) >= 0) && ((x - 3) >= 0)) ? out1[(y - 1) * pixel_length + x - 3] : 0; // R
-                                const up_left_g = (((y - 1) >= 0) && ((x - 2) >= 0)) ? out1[(y - 1) * pixel_length + x - 2] : 0; // G
-                                const up_left_b = (((y - 1) >= 0) && ((x - 1) >= 0)) ? out1[(y - 1) * pixel_length + x - 1] : 0; // B
-                                out1[out1_idx++] = out[y * scanline_length + x + 1] + paeth_predictor(up_r, left_r, up_left_r); // R
-                                out1[out1_idx++] = out[y * scanline_length + x + 2] + paeth_predictor(up_g, left_g, up_left_g); // G
-                                out1[out1_idx++] = out[y * scanline_length + x + 3] + paeth_predictor(up_b, left_b, up_left_b); // B
-                            }
-                            break;
-                    }
-                }
-            }
-
-            canvasSizeX = width;
-            canvasSizeY = height;
-
-            /*imageData = new ImageData(width, height);
-            pixels = new Uint8Array(imageData.data.buffer);
-
-            scaler.width = width;
-            scaler.height = height;*/
-
-            let offset = 0;
-            for (let x = 0; x < out1.length; x += 3) {
-                pixels[x + offset] = out1[x];
-                pixels[x + 1 + offset] = out1[x + 1];
-                pixels[x + 2 + offset] = out1[x + 2];
-                offset++;
-            }
-
-            /*const temp = new Uint8Array(pixels);
-            for (let i = 0; i < out1.length; i++) {
-                pixels[i] = out1[i];
-            }
-            render();*/
+            idat_data = new Uint8Array(crc_input.buffer, 4, length)
+            // console.log("IDAT", idat_data)
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x45, 0x4E, 0x44)) { // IEND
-            console.log("IEND")
+            // console.log("IEND")
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x74, 0x45, 0x58, 0x74)) { //tEXt
-            console.log("tEXt")
-            const data = new Uint8Array(crc_input.buffer, 4, length);
-            let out = "";
-            for (let i = 0; i < data.length; i++) {
-                out += String.fromCharCode(data[i]);
-            }
-            console.log(out);
+            // console.log("tEXt")
+            // const data = new Uint8Array(crc_input.buffer, 4, length);
+            // let out = "";
+            // for (let i = 0; i < data.length; i++) {
+            //     out += String.fromCharCode(data[i]);
+            // }
+            // console.log(out);
         }
     }
 
-    // FIRST PHASE: HUFFMAN DECODING
+    // DECODING
+    let deflate = new Zlib.Inflate(idat_data);
+    let out = deflate.decompress();
 
-    // SECOND PHASE: LEMPEL-ZIV 77 (LZ77) DECODING
+    let out1_idx = 0;
+    let out1 = new Uint8Array(width * height * 3);
 
-    // THIRD PHASE: REVERSE FILTERING
+    if (color_type === 2 && bit_depth === 8) {
+        const scanline_length = (width * 3 + 1);
+        const pixel_length = (width * 3);
+
+        for (let y = 0; y < height; y++) {
+            const filter_type = out[y * scanline_length];
+            switch (filter_type) { // NONE
+                case 0:
+                    for (let x = 0; x < pixel_length; x += 3) {
+                        out1[out1_idx++] = out[y * scanline_length + x + 1]; // R
+                        out1[out1_idx++] = out[y * scanline_length + x + 2]; // G
+                        out1[out1_idx++] = out[y * scanline_length + x + 3]; // B
+                    }
+                    break;
+                case 1: // SUB
+                    for (let x = 0; x < pixel_length; x += 3) {
+                        const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
+                        const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
+                        const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
+                        out1[out1_idx++] = out[y * scanline_length + x + 1] + left_r; // R
+                        out1[out1_idx++] = out[y * scanline_length + x + 2] + left_g; // G
+                        out1[out1_idx++] = out[y * scanline_length + x + 3] + left_b; // B
+                    }
+                    break;
+                case 2: // UP
+                    for (let x = 0; x < pixel_length; x += 3) {
+                        const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
+                        const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
+                        const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
+                        out1[out1_idx++] = out[y * scanline_length + x + 1] + up_r; // R
+                        out1[out1_idx++] = out[y * scanline_length + x + 2] + up_g; // G
+                        out1[out1_idx++] = out[y * scanline_length + x + 3] + up_b; // B
+                    }
+                    break;
+                case 3: // AVG
+                    for (let x = 0; x < pixel_length; x += 3) {
+                        const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
+                        const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
+                        const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
+                        const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
+                        const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
+                        const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
+                        out1[out1_idx++] = out[y * scanline_length + x + 1] + Math.floor((up_r + left_r) / 2) // R
+                        out1[out1_idx++] = out[y * scanline_length + x + 2] + Math.floor((up_g + left_g) / 2) // G
+                        out1[out1_idx++] = out[y * scanline_length + x + 3] + Math.floor((up_b + left_b) / 2) // B
+                    }
+                    break;
+                case 4: // PAETH
+                    for (let x = 0; x < pixel_length; x += 3) {
+                        const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
+                        const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
+                        const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
+                        const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
+                        const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
+                        const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
+                        const up_left_r = (((y - 1) >= 0) && ((x - 3) >= 0)) ? out1[(y - 1) * pixel_length + x - 3] : 0; // R
+                        const up_left_g = (((y - 1) >= 0) && ((x - 2) >= 0)) ? out1[(y - 1) * pixel_length + x - 2] : 0; // G
+                        const up_left_b = (((y - 1) >= 0) && ((x - 1) >= 0)) ? out1[(y - 1) * pixel_length + x - 1] : 0; // B
+                        out1[out1_idx++] = out[y * scanline_length + x + 1] + paeth_predictor(up_r, left_r, up_left_r); // R
+                        out1[out1_idx++] = out[y * scanline_length + x + 2] + paeth_predictor(up_g, left_g, up_left_g); // G
+                        out1[out1_idx++] = out[y * scanline_length + x + 3] + paeth_predictor(up_b, left_b, up_left_b); // B
+                    }
+                    break;
+            }
+        }
+    }
+
+    canvasSizeX = width;
+    canvasSizeY = height;
+
+    imageData = new ImageData(width, height);
+    pixels = new Uint8Array(imageData.data.buffer);
+
+    scaler.width = width;
+    scaler.height = height;
+
+    let offset = 0;
+    for (let x = 0; x < out1.length; x += 3) {
+        pixels[x + offset] = out1[x];
+        pixels[x + 1 + offset] = out1[x + 1];
+        pixels[x + 2 + offset] = out1[x + 2];
+        pixels[x + 3 + offset] = 255;
+        offset++;
+    }
+    
+    if (canvasSizeX / canvasSizeY > displayWidth / displayHeight) {
+        zoom = ((displayWidth) / (canvasSizeX * 1.2)).clamp(0.01, 100)
+    } else {
+        zoom = ((displayHeight) / (canvasSizeY * 1.2)).clamp(0.01, 100)
+    }
+    
+    posX = 0;
+    posY = 0;
+
+    outsidePixels = {}
+
+    render();
+
+    /*const temp = new Uint8Array(pixels);
+    for (let i = 0; i < out1.length; i++) {
+        pixels[i] = out1[i];
+    }
+    render();*/
 }
 // #endregion
 
@@ -508,7 +512,7 @@ const import_img = (type) => {
             reader.addEventListener("loadend", (ev) => {
                 if (ev.target.readyState == FileReader.DONE) {
                     const arrayBuffer = ev.target.result;
-                    decode_png(arrayBuffer);
+                    decode_png(file.name, arrayBuffer);
                 }
             });
         }
