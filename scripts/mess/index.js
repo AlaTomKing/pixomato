@@ -156,7 +156,7 @@ const render = () => {
   const canvasWidth = Math.floor((canvasSizeX * zoom) * res) / res
   const canvasHeight = Math.floor((canvasSizeY * zoom) * res) / res
 
-  setRGBFill(255, 255, 255, 1);
+  setRGBFill(127, 127, 127, 1);
   fillRect(
     canvasPosX,
     canvasPosY,
@@ -293,6 +293,7 @@ const insertPixel = (currentPixelX, currentPixelY) => {
       pixels[position] = r;
       pixels[position + 1] = g;
       pixels[position + 2] = b;
+      pixels[position + 3] = 255;
     } else {
       outsidePixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
     }

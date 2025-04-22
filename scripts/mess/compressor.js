@@ -383,74 +383,87 @@ const decode_png = (file_name, buffer) => {
         }
     }
 
+    // filter functions: (sub, up, avg, paeth)
+    const sub_defilter = () => {
+
+    };
+    const up_defilter = () => {
+
+    };
+    const avg_defilter = () => {
+
+    };
+    const paeth_defilter = () => {
+
+    };
+
     // DECODING
     let deflate = new Zlib.Inflate(idat_data);
     let out = deflate.decompress();
 
-    let out1_idx = 0;
-    let out1 = new Uint8Array(width * height * 3);
+    // CHANNEL
+    let channels;
 
-    if (color_type === 2 && bit_depth === 8) {
-        const scanline_length = (width * 3 + 1);
-        const pixel_length = (width * 3);
+    switch (color_type) {
+        case 0: // GREYSCALE
+            channels = 1;
+            break;
+        case 2: // TRUECOLOR
+            channels = 3;
+            break;
+        case 3: // INDEXED
+            channels = 1;
+            break;
+        case 4: // GREYSCALE WITH ALPHA
+            channels = 2;
+            break;
+        case 6: // TRUECOLOR WITH ALPHA
+            channels = 4;
+            break;
+    }
+
+    console.log(channels)
+
+    let out1_idx = 0;
+    let out1 = new Uint8Array(width * height * channels);
+
+    if (color_type !== 3 && bit_depth === 8) {
+        const scanline_length = (width * channels + 1);
+        const pixel_length = (width * channels);
 
         for (let y = 0; y < height; y++) {
             const filter_type = out[y * scanline_length];
             switch (filter_type) { // NONE
                 case 0:
-                    for (let x = 0; x < pixel_length; x += 3) {
-                        out1[out1_idx++] = out[y * scanline_length + x + 1]; // R
-                        out1[out1_idx++] = out[y * scanline_length + x + 2]; // G
-                        out1[out1_idx++] = out[y * scanline_length + x + 3]; // B
+                    for (let x = 0; x < pixel_length; x++) {
+                        out1[out1_idx++] = out[y * scanline_length + x + 1];
                     }
                     break;
                 case 1: // SUB
-                    for (let x = 0; x < pixel_length; x += 3) {
-                        const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
-                        const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
-                        const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
-                        out1[out1_idx++] = out[y * scanline_length + x + 1] + left_r; // R
-                        out1[out1_idx++] = out[y * scanline_length + x + 2] + left_g; // G
-                        out1[out1_idx++] = out[y * scanline_length + x + 3] + left_b; // B
+                    for (let x = 0; x < pixel_length; x++) {
+                        const left = ((x - channels) >= 0) ? out1[y * pixel_length + x - channels] : 0;
+                        out1[out1_idx++] = out[y * scanline_length + x + 1] + left;
                     }
                     break;
                 case 2: // UP
-                    for (let x = 0; x < pixel_length; x += 3) {
-                        const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
-                        const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
-                        const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
-                        out1[out1_idx++] = out[y * scanline_length + x + 1] + up_r; // R
-                        out1[out1_idx++] = out[y * scanline_length + x + 2] + up_g; // G
-                        out1[out1_idx++] = out[y * scanline_length + x + 3] + up_b; // B
+                    for (let x = 0; x < pixel_length; x++) {
+                        const up = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0;
+                        out1[out1_idx++] = out[y * scanline_length + x + 1] + up;
                     }
                     break;
                 case 3: // AVG
-                    for (let x = 0; x < pixel_length; x += 3) {
-                        const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
-                        const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
-                        const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
-                        const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
-                        const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
-                        const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
-                        out1[out1_idx++] = out[y * scanline_length + x + 1] + Math.floor((up_r + left_r) / 2) // R
-                        out1[out1_idx++] = out[y * scanline_length + x + 2] + Math.floor((up_g + left_g) / 2) // G
-                        out1[out1_idx++] = out[y * scanline_length + x + 3] + Math.floor((up_b + left_b) / 2) // B
+                    for (let x = 0; x < pixel_length; x++) {
+                        const up = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0;
+                        const left = ((x - channels) >= 0) ? out1[y * pixel_length + x - channels] : 0;
+                        out1[out1_idx++] = out[y * scanline_length + x + 1] + Math.floor((up + left) / 2)
                     }
                     break;
                 case 4: // PAETH
-                    for (let x = 0; x < pixel_length; x += 3) {
-                        const up_r = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0; // R
-                        const up_g = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 1] : 0; // G
-                        const up_b = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x + 2] : 0; // B
-                        const left_r = ((x - 3) >= 0) ? out1[y * pixel_length + x - 3] : 0; // R
-                        const left_g = ((x - 2) >= 0) ? out1[y * pixel_length + x - 2] : 0; // G
-                        const left_b = ((x - 1) >= 0) ? out1[y * pixel_length + x - 1] : 0; // B
-                        const up_left_r = (((y - 1) >= 0) && ((x - 3) >= 0)) ? out1[(y - 1) * pixel_length + x - 3] : 0; // R
-                        const up_left_g = (((y - 1) >= 0) && ((x - 2) >= 0)) ? out1[(y - 1) * pixel_length + x - 2] : 0; // G
-                        const up_left_b = (((y - 1) >= 0) && ((x - 1) >= 0)) ? out1[(y - 1) * pixel_length + x - 1] : 0; // B
-                        out1[out1_idx++] = out[y * scanline_length + x + 1] + paeth_predictor(up_r, left_r, up_left_r); // R
-                        out1[out1_idx++] = out[y * scanline_length + x + 2] + paeth_predictor(up_g, left_g, up_left_g); // G
-                        out1[out1_idx++] = out[y * scanline_length + x + 3] + paeth_predictor(up_b, left_b, up_left_b); // B
+                    for (let x = 0; x < pixel_length; x++) {
+                        const up = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0;
+                        const left = ((x - channels) >= 0) ? out1[y * pixel_length + x - channels] : 0;
+                        const up_left = (((y - 1) >= 0) && ((x - channels) >= 0)) ? out1[(y - 1) * pixel_length + x - channels] : 0; // R
+                        out1[out1_idx++] = out[y * scanline_length + x + 1] + paeth_predictor(up, left, up_left); // R
                     }
                     break;
             }
@@ -467,20 +480,22 @@ const decode_png = (file_name, buffer) => {
     scaler.height = height;
 
     let offset = 0;
-    for (let x = 0; x < out1.length; x += 3) {
-        pixels[x + offset] = out1[x];
-        pixels[x + 1 + offset] = out1[x + 1];
-        pixels[x + 2 + offset] = out1[x + 2];
-        pixels[x + 3 + offset] = 255;
-        offset++;
+    for (let x = 0; x < out1.length; x += channels) {
+        for (let i = 0; i < channels; i++) {
+            pixels[x + offset + i] = out1[x + i];
+        }
+        if (channels === 3) {
+            pixels[x + 3 + offset] = 255;
+            offset++;
+        }
     }
-    
+
     if (canvasSizeX / canvasSizeY > displayWidth / displayHeight) {
         zoom = ((displayWidth) / (canvasSizeX * 1.2)).clamp(0.01, 100)
     } else {
         zoom = ((displayHeight) / (canvasSizeY * 1.2)).clamp(0.01, 100)
     }
-    
+
     posX = 0;
     posY = 0;
 
