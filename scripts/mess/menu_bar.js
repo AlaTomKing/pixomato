@@ -49,13 +49,13 @@ const menuCtx = {
         {
             type: "button",
             label: "Import PNG...",
-            func: () => { import_img("png") }
+            func: () => { window.import_img("png") }
         },
         {
             type: "button",
             label: "Import QOI...",
             disabled: "true",
-            func: () => { import_img("qoi") }
+            func: () => { window.import_img("qoi") }
         },
         {
             type: "separator"

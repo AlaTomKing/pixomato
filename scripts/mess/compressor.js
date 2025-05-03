@@ -1,3 +1,5 @@
+const pako = require('pako');
+
 // #region "QUITE OKAY IMAGE" PICTURE FORMAT
 const encode_qoi = (data, desc) => {
     // This encoder is based off the Quite OK Image format by Dominic Szablewski.
@@ -249,6 +251,8 @@ const decode_png = (file_name, buffer) => {
     const bytes = new Uint8Array(buffer);
     let p = 0;
 
+    const inflator = new pako.Inflate();
+
     if (bytes[p++] === 0x89 &&
         bytes[p++] === 0x50 &&
         bytes[p++] === 0x4E &&
@@ -270,7 +274,7 @@ const decode_png = (file_name, buffer) => {
     let palette;
 
     // IDAT (pixomato only supports one chunk)
-    let idat_data;
+    let idat_data = [];
 
     // chunkz
     while (p < bytes.length) {
@@ -305,11 +309,11 @@ const decode_png = (file_name, buffer) => {
         //console.log(crc1 << 24 | crc2 << 16 | crc3 << 8 | crc4);
         //console.log(crc_input, crc1.toString(16), crc2.toString(16), crc3.toString(16), crc4.toString(16));
         if (calc_crc_32(crc_input) !== crc) {
-            console.error(`(${file_name}): PNG_CRC_MISMATCH; "yeah the imported png file gotta be corrupted or something"`);
-            return -1;
+            console.warn(`(${file_name}): PNG_CRC_MISMATCH; "the imported png file may be corrupted or something"`);
         };
 
         let i = 4;
+        console.log(String.fromCharCode(t_1), String.fromCharCode(t_2), String.fromCharCode(t_3), String.fromCharCode(t_4))
         if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x48, 0x44, 0x52)) { // IHDR
             width = (crc_input[i++] << 24 | crc_input[i++] << 16 | crc_input[i++] << 8 | crc_input[i++]) >>> 0;
             height = (crc_input[i++] << 24 | crc_input[i++] << 16 | crc_input[i++] << 8 | crc_input[i++]) >>> 0;
@@ -368,7 +372,7 @@ const decode_png = (file_name, buffer) => {
                 console.error("compression method other than 0 for the imported png file. other methods coming soon!")
                 return -1;
             }
-            idat_data = new Uint8Array(crc_input.buffer, 4, length)
+            idat_data.push(new Uint8Array(crc_input.buffer, 4, length));
             // console.log("IDAT", idat_data)
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x45, 0x4E, 0x44)) { // IEND
             // console.log("IEND")
@@ -383,23 +387,25 @@ const decode_png = (file_name, buffer) => {
         }
     }
 
-    // filter functions: (sub, up, avg, paeth)
-    const sub_defilter = () => {
+    const extract_byte = (b, idx) => {
+        return ((b >> (bit_depth*((8/bit_depth)-1-idx))) & ((2**bit_depth) - 1))
+    }
 
-    };
-    const up_defilter = () => {
-
-    };
-    const avg_defilter = () => {
-
-    };
-    const paeth_defilter = () => {
-
-    };
+    console.log("compression: ", compression, idat_data)
 
     // DECODING
-    let deflate = new Zlib.Inflate(idat_data);
-    let out = deflate.decompress();
+    //let deflate = new Zlib.Inflate(idat_data);
+    for (let idat_idx = 0; idat_idx < idat_data.length; idat_idx++) {
+        inflator.push(idat_data[idat_idx], idat_idx >= idat_data.length - 1);
+    }
+
+    if (inflator.err) {
+        console.log(inflator.msg);
+        return -1;
+    }
+    
+    let out = inflator.result;
+    console.log(out)
 
     // CHANNEL
     let channels;
@@ -422,52 +428,88 @@ const decode_png = (file_name, buffer) => {
             break;
     }
 
-    console.log(channels)
+    console.log(channels, "interlace: ", interlace)
 
     let out1_idx = 0;
     let out1 = new Uint8Array(width * height * channels);
 
-    if (color_type !== 3 && bit_depth === 8) {
-        const scanline_length = (width * channels + 1);
-        const pixel_length = (width * channels);
+    const pixel_length = (width * channels);
+    const real_length = pixel_length / (8 / bit_depth);
+    const scanline_length = Math.ceil(real_length) + 1;
 
+    if (interlace === 0) {
         for (let y = 0; y < height; y++) {
             const filter_type = out[y * scanline_length];
             switch (filter_type) { // NONE
                 case 0:
                     for (let x = 0; x < pixel_length; x++) {
-                        out1[out1_idx++] = out[y * scanline_length + x + 1];
+                        out1[out1_idx++] = extract_byte(out[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth));
                     }
                     break;
                 case 1: // SUB
                     for (let x = 0; x < pixel_length; x++) {
-                        const left = ((x - channels) >= 0) ? out1[y * pixel_length + x - channels] : 0;
-                        out1[out1_idx++] = out[y * scanline_length + x + 1] + left;
+                        const left = ((x - channels) >= 0) ? extract_byte(out1[y * pixel_length + x - channels], x % (8 / bit_depth)) : 0;
+                        out1[out1_idx++] = extract_byte(out[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + left;
                     }
                     break;
                 case 2: // UP
                     for (let x = 0; x < pixel_length; x++) {
-                        const up = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0;
-                        out1[out1_idx++] = out[y * scanline_length + x + 1] + up;
+                        const up = ((y - 1) >= 0) ? extract_byte(out1[(y - 1) * pixel_length + x], x % (8 / bit_depth)) : 0;
+                        out1[out1_idx++] = extract_byte(out[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + up;
                     }
                     break;
                 case 3: // AVG
                     for (let x = 0; x < pixel_length; x++) {
-                        const up = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0;
-                        const left = ((x - channels) >= 0) ? out1[y * pixel_length + x - channels] : 0;
-                        out1[out1_idx++] = out[y * scanline_length + x + 1] + Math.floor((up + left) / 2)
+                        const up = ((y - 1) >= 0) ? extract_byte(out1[(y - 1) * pixel_length + x], x % (8 / bit_depth)) : 0;
+                        const left = ((x - channels) >= 0) ? extract_byte(out1[y * pixel_length + x - channels], x % (8 / bit_depth)) : 0;
+                        out1[out1_idx++] = extract_byte(out[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + Math.floor((up + left) / 2)
                     }
                     break;
                 case 4: // PAETH
                     for (let x = 0; x < pixel_length; x++) {
-                        const up = ((y - 1) >= 0) ? out1[(y - 1) * pixel_length + x] : 0;
-                        const left = ((x - channels) >= 0) ? out1[y * pixel_length + x - channels] : 0;
-                        const up_left = (((y - 1) >= 0) && ((x - channels) >= 0)) ? out1[(y - 1) * pixel_length + x - channels] : 0; // R
-                        out1[out1_idx++] = out[y * scanline_length + x + 1] + paeth_predictor(up, left, up_left); // R
+                        const up = ((y - 1) >= 0) ? extract_byte(out1[(y - 1) * pixel_length + x], x % (8 / bit_depth)) : 0;
+                        const left = ((x - channels) >= 0) ? extract_byte(out1[y * pixel_length + x - channels], x % (8 / bit_depth)) : 0;
+                        const up_left = (((y - 1) >= 0) && ((x - channels) >= 0)) ? extract_byte(out1[(y - 1) * pixel_length + x - channels], x % (8 / bit_depth)) : 0; // R
+                        out1[out1_idx++] = extract_byte(out[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + paeth_predictor(up, left, up_left); // R
                     }
                     break;
             }
         }
+    } else {
+        // adam7 time (the interlacing algorithm)
+        /*let width;
+        let height;
+        let colors;
+        let bitDepth;
+        let data;
+        let bytesPerPixel = Math.max(1, colors * bitDepth / 8);
+
+        let startX = [0, 0, 4, 0, 2, 0, 1];
+        let incX = [8, 8, 8, 4, 4, 2, 2];
+        let startY = [0, 4, 0, 2, 0, 1, 0];
+        let incY = [8, 8, 4, 4, 2, 2, 1];
+        let offset = 0;
+
+        for(let i=0; i<7; i++) {
+          let subWidth = Math.ceil((width - startY[i]) / incY[i], 10);
+          let subHeight = Math.ceil((height - startX[i]) / incX[i], 10);
+          let subBytesPerRow = bytesPerPixel * subWidth;
+          let offsetEnd = offset + (subBytesPerRow + 1) * subHeight;
+          let subData = data.slice(offset, offsetEnd);
+        
+          let subPixelsBuffer = this.interlaceNone(subData, subWidth, subHeight, bytesPerPixel, subBytesPerRow);
+          let subOffset = 0;
+          for(let x=startX[i]; x<height; x+=incX[i]) {
+            for(let y=startY[i]; y<width; y+=incY[i]) {
+              for(let z=0; z<bytesPerPixel; z++) {
+                pixelsBuffer[(x * width + y) * bytesPerPixel + z] = subPixelsBuffer[subOffset++] & 0xFF;
+              }
+            }
+          }
+          offset = offsetEnd;
+        }
+        return pixelsBuffer;*/
+        out1 = out
     }
 
     canvasSizeX = width;
@@ -479,14 +521,25 @@ const decode_png = (file_name, buffer) => {
     scaler.width = width;
     scaler.height = height;
 
-    let offset = 0;
-    for (let x = 0; x < out1.length; x += channels) {
-        for (let i = 0; i < channels; i++) {
-            pixels[x + offset + i] = out1[x + i];
+    if (color_type !== 3) {
+        let offset = 0;
+        for (let x = 0; x < out1.length; x += channels) {
+            for (let i = 0; i < channels; i++) {
+                pixels[x + offset + i] = out1[x + i];
+            }
+            if (channels === 3) {
+                pixels[x + 3 + offset] = 255;
+                offset++;
+            }
         }
-        if (channels === 3) {
-            pixels[x + 3 + offset] = 255;
-            offset++;
+    } else {
+        console.log(palette, out1)
+        let pixel_idx = 0;
+        for (let x = 0; x < out1.length; x++) {
+            pixels[pixel_idx++] = palette[out1[x]*3]
+            pixels[pixel_idx++] = palette[out1[x]*3+1]
+            pixels[pixel_idx++] = palette[out1[x]*3+2]
+            pixels[pixel_idx++] = 255
         }
     }
 
@@ -511,7 +564,7 @@ const decode_png = (file_name, buffer) => {
 }
 // #endregion
 
-const import_img = (type) => {
+global.import_img = (type) => {
     let input = document.createElement('input');
     input.type = 'file';
 
@@ -552,4 +605,21 @@ const import_img = (type) => {
     input.click();
 }
 
-//decode_png(test_png_data)
+global.export_img = async () => {
+    function download(file, text) {
+
+        //creating an invisible element
+
+        let element = document.createElement('a');
+        element.setAttribute('href',
+            'data:text/plain;charset=utf-8, '
+            + encodeURIComponent(text));
+        element.setAttribute('download', file);
+        document.body.appendChild(element);
+        element.click();
+
+        document.body.removeChild(element);
+    }
+
+    download("test10.txt", "pixomato is the future")
+}

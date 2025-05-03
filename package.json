@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "pako": "^2.1.0"
+  },
+  "scripts": {
+    "build": "browserify ./scripts/mess/compressor.js -o bundle.js"
+  }
+}
