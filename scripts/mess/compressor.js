@@ -1,4 +1,4 @@
-const pako = require('pako');
+const pako = this.pako
 
 // #region "QUITE OKAY IMAGE" PICTURE FORMAT
 const encode_qoi = (data, desc) => {
@@ -261,7 +261,6 @@ const decode_png = (file_name, buffer) => {
         bytes[p++] === 0x0A &&
         bytes[p++] === 0x1A &&
         bytes[p++] === 0x0A) {
-        console.log(bytes);
     } else {
         console.error(`(${file_name}): PNG_INVALID_FILE; "yeahhh the imported file is not png"`);
         return -1;
@@ -313,7 +312,7 @@ const decode_png = (file_name, buffer) => {
         };
 
         let i = 4;
-        console.log(String.fromCharCode(t_1), String.fromCharCode(t_2), String.fromCharCode(t_3), String.fromCharCode(t_4))
+
         if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x48, 0x44, 0x52)) { // IHDR
             width = (crc_input[i++] << 24 | crc_input[i++] << 16 | crc_input[i++] << 8 | crc_input[i++]) >>> 0;
             height = (crc_input[i++] << 24 | crc_input[i++] << 16 | crc_input[i++] << 8 | crc_input[i++]) >>> 0;
@@ -325,7 +324,6 @@ const decode_png = (file_name, buffer) => {
 
             switch (bit_depth) {
                 case 1: case 2: case 4: case 8:
-                    console.log(`bit depth: ${bit_depth}`)
                     break;
                 case 16:
                     console.error(`(${file_name}): PNG_UNSUPPORTED_BIT_DEPTH; "Pixomato does not support 16-bit color"`);
@@ -335,30 +333,11 @@ const decode_png = (file_name, buffer) => {
                     return -1;
             }
 
-            switch (color_type) {
-                case 0:
-                    console.log("COLOR TYPE GREYSCALE");
-                    break;
-                case 2:
-                    console.log("COLOR TYPE TRUECOLOR");
-                    break;
-                case 3:
-                    console.log("COLOR TYPE INDEXED");
-                    break;
-                case 4:
-                    console.log("COLOR TYPE GREYSCALE WITH ALPHA");
-                    break;
-                case 6:
-                    console.log("COLOR TYPE TRUECOLOR WITH ALPHA");
-                    break;
-            }
-
             if (width === 0 || height === 0) {
                 console.error("the imported png file has no width or height. are you trying to import nothing?")
                 return - 1;
             }
 
-            console.log(width, height, bit_depth, color_type, compression, filter, interlace)
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x50, 0x4C, 0x54, 0x45)) { // PLTE
             if (color_type != 3) {
                 console.error(`(${file_name}): PNG_ILLEGAL_CHUNK; "the imported png file has a color palette, but the color type is not indexed"`);
@@ -388,10 +367,57 @@ const decode_png = (file_name, buffer) => {
     }
 
     const extract_byte = (b, idx) => {
-        return ((b >> (bit_depth*((8/bit_depth)-1-idx))) & ((2**bit_depth) - 1))
+        return ((b >> (bit_depth * ((8 / bit_depth) - 1 - idx))) & ((2 ** bit_depth) - 1))
     }
 
-    console.log("compression: ", compression, idat_data)
+    const defilter = (data, width, height) => {
+        let out_idx = 0;
+        const out = new Uint8Array(width * height * channels);
+
+        const pixel_length = (width * channels);
+        const real_length = pixel_length / (8 / bit_depth);
+        const scanline_length = Math.ceil(real_length) + 1;
+
+        for (let y = 0; y < height; y++) {
+            const filter_type = data[y * scanline_length];
+            switch (filter_type) { // NONE
+                case 0:
+                    for (let x = 0; x < pixel_length; x++) {
+                        out[out_idx++] = extract_byte(data[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth));
+                    }
+                    break;
+                case 1: // SUB
+                    for (let x = 0; x < pixel_length; x++) {
+                        const left = ((x - channels) >= 0) ? extract_byte(out[y * pixel_length + x - channels], x % (8 / bit_depth)) : 0;
+                        out[out_idx++] = extract_byte(data[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + left;
+                    }
+                    break;
+                case 2: // UP
+                    for (let x = 0; x < pixel_length; x++) {
+                        const up = ((y - 1) >= 0) ? extract_byte(out[(y - 1) * pixel_length + x], x % (8 / bit_depth)) : 0;
+                        out[out_idx++] = extract_byte(data[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + up;
+                    }
+                    break;
+                case 3: // AVG
+                    for (let x = 0; x < pixel_length; x++) {
+                        const up = ((y - 1) >= 0) ? extract_byte(out[(y - 1) * pixel_length + x], x % (8 / bit_depth)) : 0;
+                        const left = ((x - channels) >= 0) ? extract_byte(out[y * pixel_length + x - channels], x % (8 / bit_depth)) : 0;
+                        out[out_idx++] = extract_byte(data[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + Math.floor((up + left) / 2)
+                    }
+                    break;
+                case 4: // PAETH
+                    for (let x = 0; x < pixel_length; x++) {
+                        const up = ((y - 1) >= 0) ? extract_byte(out[(y - 1) * pixel_length + x], x % (8 / bit_depth)) : 0;
+                        const left = ((x - channels) >= 0) ? extract_byte(out[y * pixel_length + x - channels], x % (8 / bit_depth)) : 0;
+                        const up_left = (((y - 1) >= 0) && ((x - channels) >= 0)) ? extract_byte(out[(y - 1) * pixel_length + x - channels], x % (8 / bit_depth)) : 0; // R
+                        out[out_idx++] = extract_byte(data[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + paeth_predictor(up, left, up_left); // R
+                    }
+                    break;
+            }
+        }
+
+        return out;
+    }
 
     // DECODING
     //let deflate = new Zlib.Inflate(idat_data);
@@ -400,12 +426,11 @@ const decode_png = (file_name, buffer) => {
     }
 
     if (inflator.err) {
-        console.log(inflator.msg);
+        console.error(inflator.msg);
         return -1;
     }
-    
+
     let out = inflator.result;
-    console.log(out)
 
     // CHANNEL
     let channels;
@@ -428,88 +453,48 @@ const decode_png = (file_name, buffer) => {
             break;
     }
 
-    console.log(channels, "interlace: ", interlace)
+    let out1;
 
-    let out1_idx = 0;
-    let out1 = new Uint8Array(width * height * channels);
+    if (interlace === 1) {
+        // adam7 time (the interlacing algorithm)
+        const startX = [0, 4, 0, 2, 0, 1, 0]
+        const incX = [8, 8, 4, 4, 2, 2, 1]
+        const startY = [0, 0, 4, 0, 2, 0, 1]
+        const incY = [8, 8, 8, 4, 4, 2, 2]
 
-    const pixel_length = (width * channels);
-    const real_length = pixel_length / (8 / bit_depth);
-    const scanline_length = Math.ceil(real_length) + 1;
+        out1 = new Uint8Array(height * width * channels)
 
-    if (interlace === 0) {
-        for (let y = 0; y < height; y++) {
-            const filter_type = out[y * scanline_length];
-            switch (filter_type) { // NONE
-                case 0:
-                    for (let x = 0; x < pixel_length; x++) {
-                        out1[out1_idx++] = extract_byte(out[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth));
-                    }
-                    break;
-                case 1: // SUB
-                    for (let x = 0; x < pixel_length; x++) {
-                        const left = ((x - channels) >= 0) ? extract_byte(out1[y * pixel_length + x - channels], x % (8 / bit_depth)) : 0;
-                        out1[out1_idx++] = extract_byte(out[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + left;
-                    }
-                    break;
-                case 2: // UP
-                    for (let x = 0; x < pixel_length; x++) {
-                        const up = ((y - 1) >= 0) ? extract_byte(out1[(y - 1) * pixel_length + x], x % (8 / bit_depth)) : 0;
-                        out1[out1_idx++] = extract_byte(out[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + up;
-                    }
-                    break;
-                case 3: // AVG
-                    for (let x = 0; x < pixel_length; x++) {
-                        const up = ((y - 1) >= 0) ? extract_byte(out1[(y - 1) * pixel_length + x], x % (8 / bit_depth)) : 0;
-                        const left = ((x - channels) >= 0) ? extract_byte(out1[y * pixel_length + x - channels], x % (8 / bit_depth)) : 0;
-                        out1[out1_idx++] = extract_byte(out[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + Math.floor((up + left) / 2)
-                    }
-                    break;
-                case 4: // PAETH
-                    for (let x = 0; x < pixel_length; x++) {
-                        const up = ((y - 1) >= 0) ? extract_byte(out1[(y - 1) * pixel_length + x], x % (8 / bit_depth)) : 0;
-                        const left = ((x - channels) >= 0) ? extract_byte(out1[y * pixel_length + x - channels], x % (8 / bit_depth)) : 0;
-                        const up_left = (((y - 1) >= 0) && ((x - channels) >= 0)) ? extract_byte(out1[(y - 1) * pixel_length + x - channels], x % (8 / bit_depth)) : 0; // R
-                        out1[out1_idx++] = extract_byte(out[y * scanline_length + Math.floor(x / (8 / bit_depth)) + 1], x % (8 / bit_depth)) + paeth_predictor(up, left, up_left); // R
-                    }
-                    break;
+        let idx_i = 0
+        let wid, hei
+
+        for (let i = 0; i < 7; i++) {
+            wid = 0;
+            hei = 0;
+
+            for (let x = startX[i]; x < width; x += incX[i])
+                wid++;
+
+            for (let y = startY[i]; y < height; y += incY[i])
+                hei++;
+
+            if (hei !== 0 && wid !== 0) {
+                const data = new Uint8Array(hei * Math.ceil(wid * channels / (8 / bit_depth)) + hei);
+
+                for (let i = 0; i < data.length; i++) {
+                    data[i] = out[idx_i++];
+                }
+
+                let idx_d = 0;
+                const defiltered = defilter(data, wid, hei);
+
+                for (let y = startY[i]; y < height; y += incY[i])
+                    for (let x = startX[i]; x < width; x += incX[i])
+                        for (let j = 0; j < channels; j++)
+                            out1[(y * width + x) * channels + j] = defiltered[idx_d++];
             }
         }
     } else {
-        // adam7 time (the interlacing algorithm)
-        /*let width;
-        let height;
-        let colors;
-        let bitDepth;
-        let data;
-        let bytesPerPixel = Math.max(1, colors * bitDepth / 8);
-
-        let startX = [0, 0, 4, 0, 2, 0, 1];
-        let incX = [8, 8, 8, 4, 4, 2, 2];
-        let startY = [0, 4, 0, 2, 0, 1, 0];
-        let incY = [8, 8, 4, 4, 2, 2, 1];
-        let offset = 0;
-
-        for(let i=0; i<7; i++) {
-          let subWidth = Math.ceil((width - startY[i]) / incY[i], 10);
-          let subHeight = Math.ceil((height - startX[i]) / incX[i], 10);
-          let subBytesPerRow = bytesPerPixel * subWidth;
-          let offsetEnd = offset + (subBytesPerRow + 1) * subHeight;
-          let subData = data.slice(offset, offsetEnd);
-        
-          let subPixelsBuffer = this.interlaceNone(subData, subWidth, subHeight, bytesPerPixel, subBytesPerRow);
-          let subOffset = 0;
-          for(let x=startX[i]; x<height; x+=incX[i]) {
-            for(let y=startY[i]; y<width; y+=incY[i]) {
-              for(let z=0; z<bytesPerPixel; z++) {
-                pixelsBuffer[(x * width + y) * bytesPerPixel + z] = subPixelsBuffer[subOffset++] & 0xFF;
-              }
-            }
-          }
-          offset = offsetEnd;
-        }
-        return pixelsBuffer;*/
-        out1 = out
+        out1 = defilter(out, width, height);
     }
 
     canvasSizeX = width;
@@ -533,12 +518,11 @@ const decode_png = (file_name, buffer) => {
             }
         }
     } else {
-        console.log(palette, out1)
         let pixel_idx = 0;
         for (let x = 0; x < out1.length; x++) {
-            pixels[pixel_idx++] = palette[out1[x]*3]
-            pixels[pixel_idx++] = palette[out1[x]*3+1]
-            pixels[pixel_idx++] = palette[out1[x]*3+2]
+            pixels[pixel_idx++] = palette[out1[x] * 3]
+            pixels[pixel_idx++] = palette[out1[x] * 3 + 1]
+            pixels[pixel_idx++] = palette[out1[x] * 3 + 2]
             pixels[pixel_idx++] = 255
         }
     }
@@ -564,7 +548,7 @@ const decode_png = (file_name, buffer) => {
 }
 // #endregion
 
-global.import_img = (type) => {
+const import_img = (type) => {
     let input = document.createElement('input');
     input.type = 'file';
 
@@ -605,7 +589,7 @@ global.import_img = (type) => {
     input.click();
 }
 
-global.export_img = async () => {
+const export_img = async () => {
     function download(file, text) {
 
         //creating an invisible element
