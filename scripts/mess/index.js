@@ -587,6 +587,17 @@ window.addEventListener("load", () => {
       pixels[i + 2] = idx * 16;
       idx++;
     }*/
+    
+    // const startX = [0, 4, 0, 2, 0, 1, 0]
+    // const incX = [8, 8, 4, 4, 2, 2, 1]
+    // const startY = [0, 0, 4, 0, 2, 0, 1]
+    // const incY = [8, 8, 8, 4, 4, 2, 2]
+    
+    // for (let i = 0; i < 7; i++)
+    //   for (let x = startX[i]; x < canvasSizeX; x += incX[i])
+    //       for (let y = startY[i]; y < canvasSizeY; y += incY[i])
+    //           for (let j = 0; j < channels; j++)
+    //               pixels[(y * canvasSizeX + x) * channels + j] = 0;
 
     render();
     resize();
