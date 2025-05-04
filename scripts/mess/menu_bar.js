@@ -79,9 +79,33 @@ const menuCtx = {
             type: "button",
             label: "export png upscaled 4 times...",
             func: () => {
-                export_img("png", pixels, {
-                    width: canvasSizeX,
-                    height: canvasSizeY,
+                const scale = 4
+                let new_pixels_idx = 0;
+                const new_pixels = new Uint8Array((canvasSizeX * scale) * (canvasSizeY * scale) * channels);
+
+                // for (let y = 0; y < canvasSizeY; y++) {
+                //     for (let r = 0; r < scale; r++) {
+                //         for (let x = 0; x < canvasSizeX; x++) {
+                //             for (let j = 0; j < scale; j++) {
+                //                 for (let i = 0; i < channels; i++) {
+                //                     new_pixels[new_pixels_idx++] = pixels[(y * canvasSizeX * channels) + (x * channels) + i];
+                //                 }
+                //             }
+                //         }
+                //     }
+                // }
+
+                for (let y = 0; y < canvasSizeY * scale; y++) {
+                    for (let x = 0; x < canvasSizeX * scale; x++) {
+                        for (let i = 0; i < channels; i++) {
+                            new_pixels[(y * canvasSizeX * scale * channels) + x * channels + i] = pixels[(Math.floor(y / scale) * canvasSizeX * channels) + Math.floor(x / scale) * channels + i];
+                        }
+                    }
+                }
+
+                export_img("png", new_pixels, {
+                    width: canvasSizeX * scale,
+                    height: canvasSizeY * scale,
                     channels: channels,
                 });
             }
