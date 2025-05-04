@@ -118,22 +118,234 @@ const paeth_predictor = (up, left, up_left) => {
     else return up_left;
 }
 
+const chunk_types = {
+    IHDR: [0x49, 0x48, 0x44, 0x52],
+    IDAT: [0x49, 0x44, 0x41, 0x54],
+    IEND: [0x49, 0x45, 0x4E, 0x44]
+}
+
 const encode_png = (data, desc) => {
     let p = 0;
 
-    let idx_r = 0;
-    let idx_g = 0;
-    let idx_b = 0;
-    let idx_a = 0;
+    /*let test_idx = 0;
+    let new_idx = 0;
 
-    const data_r = new Uint8Array(desc.width * desc.height);
-    const data_g = new Uint8Array(desc.width * desc.height);
-    const data_b = new Uint8Array(desc.width * desc.height);
-    const data_a = new Uint8Array(desc.width * desc.height);
+    let new_data = new Uint8Array(desc.width * desc.height * 3);
 
-    const data_all = new Uint8Array((desc.width * desc.height * desc.channels) + (desc.height));
+    while (test_idx < data.length) {
+        new_data[new_idx++] = data[test_idx++];
+        new_data[new_idx++] = data[test_idx++];
+        new_data[new_idx++] = data[test_idx++];
+        test_idx++;
+    }
 
-    const bytes = new Uint8Array(16);
+    data = new_data;*/
+
+    const channels = desc.channels;
+
+    // IHDR: HEADER
+    let width, height, bit_depth, color_type, compression, filter1, interlace;
+
+    width = desc.width;
+    height = desc.height;
+    bit_depth = 8;
+    color_type = 6; // pixomato only supports truecolor with alpha for now
+    compression = 0;
+    filter1 = 0;
+    interlace = 0;
+
+    const add_chunk = (type, data) => {
+        const length = data.length;
+        let crc_idx = 0;
+        const crc_input = new Uint8Array(4 + length);
+
+        // length
+        bytes[p++] = length >>> 24 & 0xff;
+        bytes[p++] = length >>> 16 & 0xff;
+        bytes[p++] = length >>> 8 & 0xff;
+        bytes[p++] = length & 0xff;
+
+        // type
+        bytes[p++] = type[0]; crc_input[crc_idx++] = type[0];
+        bytes[p++] = type[1]; crc_input[crc_idx++] = type[1];
+        bytes[p++] = type[2]; crc_input[crc_idx++] = type[2];
+        bytes[p++] = type[3]; crc_input[crc_idx++] = type[3];
+
+        // data
+        for (let i = 0; i < data.length; i++) {
+            bytes[p++] = data[i];
+            crc_input[crc_idx++] = data[i];
+        }
+
+        // crc
+        const crc = calc_crc_32(crc_input);
+        bytes[p++] = crc >>> 24 & 0xff;
+        bytes[p++] = crc >>> 16 & 0xff;
+        bytes[p++] = crc >>> 8 & 0xff;
+        bytes[p++] = crc & 0xff;
+    }
+
+    const filter = (data, width, height) => {
+        const out = new Uint8Array(width * height * channels + height);
+        const pixel_length = (width * channels);
+        const scanline_length = pixel_length + 1;
+
+        for (let y = height - 1; y >= 0; y--) {
+            let idx = 0;
+
+            let none_row = new Uint8Array(width * channels + 1); // SUB
+            let sub_row = new Uint8Array(width * channels + 1); // SUB
+            let up_row = new Uint8Array(width * channels + 1); // UP
+            let avg_row = new Uint8Array(width * channels + 1); // AVG
+            let paeth_row = new Uint8Array(width * channels + 1); // PAETH
+
+            let none_score = 0;
+            let sub_score = 0;
+            let up_score = 0;
+            let avg_score = 0;
+            let paeth_score = 0;
+
+            none_row[idx] = 0;
+            sub_row[idx] = 1;
+            up_row[idx] = 2;
+            avg_row[idx] = 3;
+            paeth_row[idx] = 4;
+
+            idx++;
+
+            for (x = 0; x < pixel_length; x++) {
+                const up = ((y - 1) >= 0) ? data[(y - 1) * pixel_length + x] : 0;
+                const left = ((x - channels) >= 0) ? data[y * pixel_length + x - channels] : 0;
+                const up_left = (((y - 1) >= 0) && ((x - channels) >= 0)) ? data[(y - 1) * pixel_length + x - channels] : 0;
+
+                const none_val = data[y * pixel_length + x];
+                const sub_val = data[y * pixel_length + x] - left;
+                const up_val = data[y * pixel_length + x] - up;
+                const avg_val = data[y * pixel_length + x] - Math.floor((up + left) / 2);
+                const paeth_val = data[y * pixel_length + x] - paeth_predictor(up, left, up_left);
+
+                none_score += Math.abs(none_val);
+                sub_score += Math.abs(sub_val);
+                up_score += Math.abs(up_val);
+                avg_score += Math.abs(avg_val);
+                paeth_score += Math.abs(paeth_val);
+
+                none_row[idx] = none_val;
+                sub_row[idx] = sub_val;
+                up_row[idx] = up_val;
+                avg_row[idx] = avg_val;
+                paeth_row[idx] = paeth_val;
+
+                idx++;
+            }
+
+            let win_idx = 0;
+            let win_row = none_row;
+
+            if (none_score > sub_score) win_idx++;
+            if (win_idx === 1 && sub_score > up_score) win_idx++;
+            if (win_idx === 2 && up_score > avg_score) win_idx++;
+            if (win_idx === 3 && avg_score > paeth_score) win_idx++;
+
+            switch (win_idx) {
+                case 0: win_row = none_row; break;
+                case 1: win_row = sub_row; break;
+                case 2: win_row = up_row; break;
+                case 3: win_row = avg_row; break;
+                case 4: win_row = paeth_row; break;
+            }
+
+            for (let i = 0; i < width * channels + 1; i++) {
+                out[y * scanline_length + i] = win_row[i];
+            }
+        }
+
+        return out;
+    }
+
+    data = filter(data, width, height);
+
+    const zlib_output = pako.deflate(data);
+
+    // TEST DEFILTER
+    /*let defilter_idx = 0;
+    const defilter = new Uint8Array(width * height * channels);
+    console.log(data)
+
+    const pixel_length = (width * channels);
+    const real_length = pixel_length;
+    const scanline_length = Math.ceil(real_length) + 1;
+
+        for (let y = 0; y < height; y++) {
+            const filter_type = data[y * scanline_length];
+            switch (filter_type) { // NONE
+                case 0:
+                    console.log("NONE");
+                    for (let x = 0; x < pixel_length; x++) {
+                        defilter[defilter_idx++] = data[y * scanline_length + x + 1];
+                    }
+                    break;
+                case 1: // SUB
+                    console.log("SUB");
+                    for (let x = 0; x < pixel_length; x++) {
+                        const left = ((x - channels) >= 0) ? defilter[y * pixel_length + x - channels] : 0;
+                        defilter[defilter_idx++] = data[y * scanline_length + x + 1] + left;
+                    }
+                    break;
+                case 2: // UP
+                    console.log("UP");
+                    for (let x = 0; x < pixel_length; x++) {
+                        const up = ((y - 1) >= 0) ? defilter[(y - 1) * pixel_length + x] : 0;
+                        defilter[defilter_idx++] = data[y * scanline_length + x + 1] + up;
+                    }
+                    break;
+                case 3: // AVG
+                    console.log("AVG");
+                    for (let x = 0; x < pixel_length; x++) {
+                        const up = ((y - 1) >= 0) ? defilter[(y - 1) * pixel_length + x] : 0;
+                        const left = ((x - channels) >= 0) ? defilter[y * pixel_length + x - channels] : 0;
+                        defilter[defilter_idx++] = data[y * scanline_length + x + 1] + Math.floor((up + left) / 2)
+                    }
+                    break;
+                case 4: // PAETH
+                    console.log("PAETH");
+                    for (let x = 0; x < pixel_length; x++) {
+                        const up = ((y - 1) >= 0) ? defilter[(y - 1) * pixel_length + x] : 0;
+                        const left = ((x - channels) >= 0) ? defilter[y * pixel_length + x - channels] : 0;
+                        const up_left = (((y - 1) >= 0) && ((x - channels) >= 0)) ? defilter[(y - 1) * pixel_length + x - channels] : 0; // R
+                        defilter[defilter_idx++] = data[y * scanline_length + x + 1] + paeth_predictor(up, left, up_left); // R
+                    }
+                    break;
+            }
+        }*/
+
+    // test trippy visualization after filtering
+    // let temp = new Uint8Array(pixels);
+    // let temp_idx = 0;
+    // let temp_idx1 = 0;
+
+    // while (temp_idx < pixels.length) {
+    //     pixels[temp_idx++] = data[temp_idx1++];
+    //     pixels[temp_idx++] = data[temp_idx1++];
+    //     pixels[temp_idx++] = data[temp_idx1++];
+    //     temp_idx++;
+    // }
+    // // for (let i = 0; i < temp.length; i++) {
+    // //     pixels[temp_idx] = filtered_data[temp_idx++];
+    // // }
+
+    // render();
+
+    // pixels = temp;
+
+    // constructing file
+    let byte_size = 0;
+    byte_size += 8; // SIGNATURE
+    byte_size += 4 + 4 + 13 + 4; // IHDR CHUNK (size, type, data, crc)
+    byte_size += 4 + 4 + zlib_output.length + 4; // IDAT CHUNK (size, type, data, crc)
+    byte_size += 4 + 4 + 4; // END CHUNK (size, type, data (0), crc)
+
+    const bytes = new Uint8Array(byte_size);
 
     // the first 8 bytes that png contains according to w3c specification (signature)
     bytes[p++] += 0x89;
@@ -145,110 +357,37 @@ const encode_png = (data, desc) => {
     bytes[p++] += 0x1A;
     bytes[p++] += 0x0A;
 
+    // IHDR header
+    add_chunk(chunk_types.IHDR, [
+        width >>> 24 & 0xff,
+        width >>> 16 & 0xff,
+        width >>> 8 & 0xff,
+        width & 0xff,
+        height >>> 24 & 0xff,
+        height >>> 16 & 0xff,
+        height >>> 8 & 0xff,
+        height & 0xff,
+        bit_depth,
+        color_type,
+        compression,
+        filter1,
+        interlace
+    ]);
+
+    // IDAT header
+    add_chunk(chunk_types.IDAT, zlib_output);
+
+    // IEND header
+    add_chunk(chunk_types.IEND, []);
+
     console.log(bytes, bytes.buffer);
-
-    // FIRST PHASE: FILTERING
-    for (let i = 0; i < data.length; i += desc.channels) {
-        data_r[idx_r++] = data[i];
-        data_g[idx_g++] = data[i + 1];
-        data_b[idx_b++] = data[i + 2];
-        if (channels == 4) data_a[idx_a++] = data[i + 3];
-    }
-
-    const filter_row = (data, y) => {
-        let idx = 0;
-
-        let none_row = new Uint8Array(desc.width); // SUB
-        let sub_row = new Uint8Array(desc.width); // SUB
-        let up_row = new Uint8Array(desc.width); // UP
-        let avg_row = new Uint8Array(desc.width); // AVG
-        let paeth_row = new Uint8Array(desc.width); // PAETH
-
-        let none_score = 0; // idx: 0
-        let sub_score = 0; // idx: 1
-        let up_score = 0; // idx: 2
-        let avg_score = 0; // idx: 3
-        let paeth_score = 0; // idx: 4
-
-        for (let x = (y * desc.width); x < ((y + 1) * desc.width); x++) {
-            none_row[idx] = data[x]; // NONE
-
-            const up = ((y - 1) >= 0) ? data[x - desc.width] : 0;
-            const left = ((x - 1) >= 0) ? data[x - 1] : 0;
-            const up_left = ((y - 1) >= 0) & ((x - 1) >= 0) ? data[x - desc.width - 1] : 0;
-
-            sub_row[idx] = data[x] - left; // SUB
-            up_row[idx] = data[x] - up; // UP
-            avg_row[idx] = data[x] - Math.floor((up + left) / 2); // AVG
-
-            // PAETH
-            const v = up + left - up_left;
-            const v_l = v - left;
-            const v_u = v - up;
-            const v_ul = v - up_left;
-            const v_min = Math.min(v_l, v_u, v_ul);
-
-            paeth_row[idx] = data[x] - v_min;
-
-            none_score += Math.abs(data[x]);
-            sub_score += Math.abs(sub_row[idx]);
-            up_score += Math.abs(up_row[idx]);
-            avg_score += Math.abs(avg_row[idx]);
-            paeth_score += Math.abs(paeth_row[idx]);
-
-            idx++;
-        }
-
-        let win_idx = 0;
-        let win_row;
-
-        if (none_score > sub_score) win_idx++;
-        if (win_idx === 1 && sub_score > up_score) win_idx++;
-        if (win_idx === 2 && up_score > avg_score) win_idx++;
-        if (win_idx === 3 && avg_score > paeth_score) win_idx++;
-
-        switch (win_idx) {
-            case 0: win_row = none_row; break;
-            case 1: win_row = sub_row; break;
-            case 2: win_row = up_row; break;
-            case 3: win_row = avg_row; break;
-            case 4: win_row = paeth_row; break;
-        }
-
-        for (let i = 0; i < desc.width; i++) {
-            data[y * desc.width + i] = win_row[i];
-        }
-        //console.log(sub_row, up_row, avg_row, paeth_row);
-    }
-
-    for (let y = desc.height - 1; y >= 0; y--) {
-        filter_row(data_r, y);
-        filter_row(data_g, y);
-        filter_row(data_b, y);
-        if (channels === 4) filter_row(data_a, y);
-    }
-
-    // trippy visualization after filtering
-    let temp = new Uint8Array(pixels);
-
-    for (let i = 0; i < desc.width * desc.height; i++) {
-        pixels[(i * channels)] = data_r[i];
-        pixels[(i * channels) + 1] = data_g[i];
-        pixels[(i * channels) + 2] = data_b[i];
-    }
-
-    render();
-
-    pixels = temp;
-
-    // SECOND PHASE: LEMPEL-ZIV 77 (LZ77) ENCODING
-
-    // THIRD PHASE: HUFFMAN ENCODING
+    return bytes.buffer;
 }
 
 const decode_png = (file_name, buffer) => {
     // checking if this is a png file by the signature
     const bytes = new Uint8Array(buffer);
+    console.log(bytes)
     let p = 0;
 
     const inflator = new pako.Inflate();
@@ -371,6 +510,7 @@ const decode_png = (file_name, buffer) => {
     }
 
     const defilter = (data, width, height) => {
+        testarr1 = data
         let out_idx = 0;
         const out = new Uint8Array(width * height * channels);
 
@@ -587,23 +727,64 @@ const import_img = (type) => {
     }
 
     input.click();
+    input.remove();
 }
 
-const export_img = async () => {
-    function download(file, text) {
+async function saveFile(plaintext, fileName, fileType) {
+    return new Promise((resolve, reject) => {
+      const dataView = new DataView(plaintext);
+      const blob = new Blob([dataView], { type: fileType });
+  
+      if (navigator.msSaveBlob) {
+        navigator.msSaveBlob(blob, fileName);
+        return resolve();
+      } else if (/iPhone|fxios/i.test(navigator.userAgent)) {
+        // This method is much slower but createObjectURL
+        // is buggy on iOS
+        const reader = new FileReader();
+        reader.addEventListener('loadend', () => {
+          if (reader.error) {
+            return reject(reader.error);
+          }
+          if (reader.result) {
+            const a = document.createElement('a');
+            // @ts-ignore
+            a.href = reader.result;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+          }
+          resolve();
+        });
+        reader.readAsDataURL(blob);
+      } else {
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        URL.revokeObjectURL(downloadUrl);
+        setTimeout(resolve, 100);
+      }
+    });
+  }
 
-        //creating an invisible element
+const export_img = (type, data, desc) => {
+    // function download(file, data) {
+    //     //creating an invisible element
 
-        let element = document.createElement('a');
-        element.setAttribute('href',
-            'data:text/plain;charset=utf-8, '
-            + encodeURIComponent(text));
-        element.setAttribute('download', file);
-        document.body.appendChild(element);
-        element.click();
+    //     let element = document.createElement('a');
+    //     element.setAttribute('href',
+    //         'data:img/png;, '
+    //         + data);
+    //     element.setAttribute('download', file);
+    //     element.click();
 
-        document.body.removeChild(element);
-    }
+    //     element.remove();
+    // }
 
-    download("test10.txt", "pixomato is the future")
+    // download("test10.png", encode_png());
+
+    saveFile(encode_png(data, desc), "pixomato_out", "image/png")
 }
