@@ -68,7 +68,7 @@ const menuCtx = {
                 mac: "Meta+Shift+E",
             },
             func: () => {
-                encode_png(pixels, {
+                export_img("png", pixels, {
                     width: canvasSizeX,
                     height: canvasSizeY,
                     channels: channels,
@@ -79,7 +79,7 @@ const menuCtx = {
             type: "button",
             label: "export png upscaled 4 times...",
             func: () => {
-                encode_png(pixels, {
+                export_img("png", pixels, {
                     width: canvasSizeX,
                     height: canvasSizeY,
                     channels: channels,
@@ -91,7 +91,7 @@ const menuCtx = {
             label: "Export QOI...",
             disabled: "true",
             func: () => {
-                encode_qoi(pixels, {
+                export_img("qoi", pixels, {
                     width: canvasSizeX,
                     height: canvasSizeY,
                     channels: channels,
