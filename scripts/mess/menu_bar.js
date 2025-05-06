@@ -188,16 +188,6 @@ const menuCtx = {
         },
         {
             type: "separator"
-        },
-        {
-            type: "button",
-            label: "clear canvas",
-            func: () => {
-                for (let i = 0; i < pixels.length; i++) {
-                    pixels[i] = 255;
-                }
-                render();
-            }
         }
     ],
     select: [
@@ -208,6 +198,23 @@ const menuCtx = {
             shortcut: {
                 win: "Ctrl+A",
                 mac: "Meta+A",
+            }
+        }
+    ],
+    layer: [
+        {
+            type: "button",
+            label: "Resize canvas...",
+            disabled: "true",
+        },
+        {
+            type: "button",
+            label: "Clear canvas",
+            func: () => {
+                for (let i = 0; i < pixels.length; i++) {
+                    pixels[i] = 255;
+                }
+                render();
             }
         }
     ],
@@ -333,6 +340,7 @@ const createMenuBtn = (name, ctxList) => {
 const fileBtn = createMenuBtn("File", menuCtx.file)
 const editBtn = createMenuBtn("Edit", menuCtx.edit)
 const selectBtn = createMenuBtn("Select", menuCtx.select)
+const layerBtn = createMenuBtn("Layer", menuCtx.layer)
 //const insertBtn = createMenuBtn("Insert", menuCtx.insert)
 const viewBtn = createMenuBtn("View", menuCtx.view)
 //const windowBtn = createMenuBtn("Window", menuCtx.window)
