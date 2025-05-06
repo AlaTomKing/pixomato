@@ -452,6 +452,7 @@ const decode_png = (file_name, buffer) => {
 
         let i = 4;
 
+        console.log(String.fromCharCode(t_1),String.fromCharCode(t_2),String.fromCharCode(t_3),String.fromCharCode(t_4))
         if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x48, 0x44, 0x52)) { // IHDR
             width = (crc_input[i++] << 24 | crc_input[i++] << 16 | crc_input[i++] << 8 | crc_input[i++]) >>> 0;
             height = (crc_input[i++] << 24 | crc_input[i++] << 16 | crc_input[i++] << 8 | crc_input[i++]) >>> 0;
@@ -495,13 +496,13 @@ const decode_png = (file_name, buffer) => {
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x49, 0x45, 0x4E, 0x44)) { // IEND
             // console.log("IEND")
         } else if (comp_bytes(t_1, t_2, t_3, t_4, 0x74, 0x45, 0x58, 0x74)) { //tEXt
-            // console.log("tEXt")
-            // const data = new Uint8Array(crc_input.buffer, 4, length);
-            // let out = "";
-            // for (let i = 0; i < data.length; i++) {
-            //     out += String.fromCharCode(data[i]);
-            // }
-            // console.log(out);
+            console.log("tEXt")
+            const data = new Uint8Array(crc_input.buffer, 4, length);
+            let out = "";
+            for (let i = 0; i < data.length; i++) {
+                out += String.fromCharCode(data[i]);
+            }
+            console.log(out);
         }
     }
 
@@ -676,7 +677,7 @@ const decode_png = (file_name, buffer) => {
     posX = 0;
     posY = 0;
 
-    outsidePixels = {}
+    outsidePixels = {};
 
     render();
 
@@ -730,6 +731,8 @@ const import_img = (type) => {
     input.remove();
 }
 
+// This code is taken from Firefox Send (https://github.com/mozilla/send) and slightly modified by thomaskonrad on GitHub.
+// And slightly slight slightly modified by me to convert this into JavaScript.
 async function saveFile(plaintext, fileName, fileType) {
     return new Promise((resolve, reject) => {
       const dataView = new DataView(plaintext);
