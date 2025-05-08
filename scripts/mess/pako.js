@@ -1,1 +1,1 @@
-global.pako = require('pako');
+/*eslint-disable*/global.pako=require('pako');

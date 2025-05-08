@@ -20,7 +20,7 @@
 
     // stops tracking mouse
     const stopDrawing = () => {
-        posX = null; pos_Y = null; mouse_down = false;
+        pos_X = null; pos_Y = null; mouse_down = false;
     }
 
     // sets color of pixel
