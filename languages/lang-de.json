@@ -1,10 +1,15 @@
 {
     "code": "de",
     
-    "lang_name_en": "Englisch (Vereinigte Staaten)",
-    "lang_name_de": "Deutsch (Deutschland)",
-    "lang_name_es": "Spanisch (Spanien)",
-    "lang_name_fr": "Französisch (Frankreich)",
+    "lang_cn": "Chinesisch (China)",
+    "lang_de": "Deutsch (Deutschland)",
+    "lang_en": "Englisch (Vereinigte Staaten)",
+    "lang_es": "Spanisch (Spanien)",
+    "lang_fr": "Französisch (Frankreich)",
+    "lang_it": "Italenisch (Italien)",
+    "lang_jp": "Japanisch (Japan)",
+    "lang_pt": "Portugesisch (Portugal)",
+    "lang_vn": "Vietnamesisch (Vietnam)",
     
     "menu_file": "Datei",
     "menu_edit": "Bearbeiten",
@@ -16,6 +21,8 @@
 
     "menu_file_new": "Neue Datei",
     "menu_file_new_animation": "Animation",
+
+    "menu_file_export": "Exportieren",
 
     "menu_help_documentation": "Dokumentation",
 
