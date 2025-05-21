@@ -1,4 +1,4 @@
-"use strict";
+/*eslint-disable*/"use strict";
 
 let zoom; // 1: 100%
 

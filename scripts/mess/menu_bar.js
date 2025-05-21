@@ -216,6 +216,41 @@ const menuCtx = {
                 }
                 render();
             }
+        },
+        {
+            type: "separator"
+        },
+        {
+            type: "button",
+            label: "Flip vertical",
+            func: () => {
+                for (let x = 0; x < canvasSizeX; x++) {
+                    for (let y = 0; y < Math.floor(canvasSizeY / 2); y++) {
+                        for (let i = 0; i < channels; i++) {
+                            const temp = pixels[(y * canvasSizeX * channels) + (x * channels) + i];
+                            pixels[(y * canvasSizeX * channels) + (x * channels) + i] = pixels[(((canvasSizeY - 1) - y) * canvasSizeX * channels) + (x * channels) + i];
+                            pixels[(((canvasSizeY - 1) - y) * canvasSizeX * channels) + (x * channels) + i] = temp;
+                        }
+                    }
+                }
+                render();
+            }
+        },
+        {
+            type: "button",
+            label: "Flip horizontal",
+            func: () => {
+                for (let x = 0; x < Math.floor(canvasSizeX / 2); x++) {
+                    for (let y = 0; y < canvasSizeY; y++) {
+                        for (let i = 0; i < channels; i++) {
+                            const temp = pixels[(y * canvasSizeX * channels) + (x * channels) + i];
+                            pixels[(y * canvasSizeX * channels) + (x * channels) + i] = pixels[(y * canvasSizeX * channels) + (((canvasSizeX - 1) - x) * channels) + i];
+                            pixels[(y * canvasSizeX * channels) + (((canvasSizeX - 1) - x) * channels) + i] = temp;
+                        }
+                    }
+                }
+                render();
+            }
         }
     ],
     view: [

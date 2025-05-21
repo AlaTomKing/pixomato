@@ -6,12 +6,14 @@ file extension: .pxmt
 
 */
 
-function frame() {
+// the keyframe that contains an image
+function keyframe() {
     this.list = [
         
     ]
 }
 
+// the layer that contains multiple keyframes
 function layer(name, fps) {
     this.name = name;
 
@@ -19,7 +21,7 @@ function layer(name, fps) {
         frames_per_second: 24,
     }
 
-    this.frames
+    this.keyframes = []
 }
 
 // represents project
