@@ -9,10 +9,10 @@ Pixomato is slightly related to PixotatoJS, which is one of my old libraries I f
 ## Supported Browsers
 I haven't done some research but first you need a decent computer or tablet. You could try either a fast supercomputer or 2000s PC.
 But I can tell you that the following browsers are accepted. However I don't know the minimum version requirement for them.
-- Google Chrome (I tested with Windows)
+- Google Chrome (I tested with Windows and Mac)
 - Firefox (I tested with Windows)
 - Any Chromium browser (I haven't tested but I'm pretty sure it will work if Google Chrome works)
-- Safari (Only tested on iOS but it will 99% work)
+- Safari (Yes I tested it and it obviously works)
 
 ### Not yet supported browsers
 Since Pixomato is made to be extremely versatile and to be supported on roughly all platforms, I decided to consider adding support to discontinued platforms as well via. web browsers.
