@@ -3,6 +3,7 @@
 Since I developed an artstyle (which I regret) of drawing pixelated cartoon characters, I have decided to develop an animator that helps me draw pixelated characters, but with mobility.
 
 Pixomato is a website written in HTML, CSS and JavaScript where I can create pixelated animations (and maybe "vector" if you crank the resolution high).
+Additionally, I use a little bit of Node.js, in which I compile them to a library called Browserify.
 
 Pixomato is slightly related to PixotatoJS, which is one of my old libraries I forgot it created which draws, you guessed it, pixels.
 
