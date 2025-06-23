@@ -7,8 +7,11 @@
     --tab-font-size: 13px;
     --tab-container-gap: 0px;
     --tab-container-padding: 0px;
+    
+    --popup-title-font-size: 13px;
 
     --ctx-menu-font-size: 12px;
+    --ctx-menu-button-padding: 5px;
 
     --widget-gap: 2px;
 
@@ -105,29 +108,30 @@ button:hover:active {
     background-color: goldenrod;
 }
 
+/* #region popup */
+
+#popup-frame {
+    position: absolute;
+    top: 32px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+}
+
 #blur-bg {
     display: block;
 
     position: absolute;
-    height: 100%;
-    width: 100%;
-
-    backdrop-filter: blur(4px);
-    background-color: rgba(0, 0, 0, 0.3);
-}
-
-#popup-frame {
-    position: absolute;
     width: 100%;
     height: 100%;
+
+    /* backdrop-filter: blur(3px); */
+    background-color: rgba(0, 0, 0, 0.4);
 }
 
 #home-screen {
     width: 75%;
     height: 75%;
-
-    min-width: 400px;
-    min-height: 400px;
 
     margin: 0;
     position: absolute;
@@ -139,7 +143,29 @@ button:hover:active {
     outline: solid 1px var(--stroke-color);
 
     border-radius: 6px;
+
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 8px 16px 4px;
 }
+
+#home-screen > #title-frame {
+    position: absolute;
+    width: 100%;
+    height: 32px;
+    border-bottom: 1px solid var(--stroke-color);
+}
+
+#title-frame > #title-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    text-align: center;
+    transform: translate(-50%, -50%);
+
+    font-size: var(--popup-title-font-size)
+}
+
+/* #endregion */
 
 #top-bar {
     position: absolute;
@@ -153,7 +179,7 @@ button:hover:active {
 }
 
 #top-bar>.title {
-    font-size: 13px;
+    font-size: var(--tab-font-size);
 
     position: absolute;
 
@@ -206,7 +232,7 @@ button:hover:active {
 
     color: var(--text-color);
     border: none;
-    font-size: 13px;
+    font-size: var(--tab-font-size);
 
     height: 22px;
     width: 100%;
@@ -417,20 +443,20 @@ button:hover:active {
 
 .context-menu-button,
 .context-menu-button-disabled {
-    height: 22px;
+    height: calc(var(--ctx-menu-font-size) + var(--ctx-menu-button-padding) * 2);
 }
 
 .context-menu-button>.context-menu-button-inner,
 .context-menu-button-disabled>.context-menu-button-inner {
-    height: 22px;
+    height: calc(var(--ctx-menu-font-size) + var(--ctx-menu-button-padding) * 2);
     margin-inline: 3px;
 }
 
 .context-menu-button-inner>.context-menu-button-shortcuts {
     display: inline;
-    height: 22px;
+    height: calc(var(--ctx-menu-font-size) + var(--ctx-menu-button-padding) * 2);
     width: fit-content;
-    line-height: 22px;
+    line-height: calc(var(--ctx-menu-font-size) + var(--ctx-menu-button-padding) * 2);
     padding-left: 44px;
     vertical-align: top;
     float: right;
@@ -438,22 +464,34 @@ button:hover:active {
 
 .context-menu-button-inner>.context-menu-button-left-icon {
     display: inline-block;
-    height: 22px;
-    width: 22px;
+    height: calc(var(--ctx-menu-font-size) + var(--ctx-menu-button-padding) * 2);
+    width: calc(var(--ctx-menu-font-size) + var(--ctx-menu-button-padding) * 2);
 }
 
 .context-menu-button-inner>.context-menu-button-right-icon {
     display: inline;
-    height: 22px;
-    width: 22px;
+    height: calc(var(--ctx-menu-font-size) + var(--ctx-menu-button-padding) * 2);
+    width: calc(var(--ctx-menu-font-size) + var(--ctx-menu-button-padding) * 2);
     float: right;
+}
+
+.context-menu-button-inner .context-menu-button-symbol {
+    width: 100%;
+    height: 100%;
+    fill: var(--text-color);
+}
+
+.context-menu-button-disabled>.context-menu-button-inner .context-menu-button-symbol {
+    width: 100%;
+    height: 100%;
+    fill: var(--text-disabled-color);
 }
 
 .context-menu-button-inner>.context-menu-button-label {
     display: inline-block;
-    height: 22px;
+    height: calc(var(--ctx-menu-font-size) + var(--ctx-menu-button-padding) * 2);
     width: fit-content;
-    line-height: 22px;
+    line-height: calc(var(--ctx-menu-font-size) + var(--ctx-menu-button-padding) * 2);
     vertical-align: top;
     /* padding-left: 5px; */
     /* padding-right: 5px; */

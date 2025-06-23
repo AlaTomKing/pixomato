@@ -1,0 +1,1 @@
+// this script is responsible for giving other scripts easy access
