@@ -1,0 +1,3 @@
+[submodule "pixomato-docs"]
+	path = pixomato-docs
+	url = https://github.com/AlaTomKing/pixomato-docs
