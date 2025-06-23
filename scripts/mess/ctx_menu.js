@@ -9,6 +9,8 @@ const ctxMenuContainer = document.getElementById("context-menu-container")
 const ctxOffsetX = 1
 const ctxOffsetY = 1
 
+const root = document.documentElement
+
 let ctxMenuBarOpen = false;
 
 const closeCtxMenu = () => {
@@ -42,7 +44,7 @@ const closeCtxMenu = () => {
 //     }
 // }
 
-const eval = (list) => {
+const evaluate = (list) => {
     if (list) {
         list.forEach(e => {
             switch (e.type) {
@@ -52,6 +54,10 @@ const eval = (list) => {
                     const shc = document.createElement("div");
                     const lfi = document.createElement("div");
                     const rti = document.createElement("div");
+                    const lfi_svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+                    const rti_svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+                    const lfi_svg_path = document.createElementNS("http://www.w3.org/2000/svg","path");
+                    const rti_svg_path = document.createElementNS("http://www.w3.org/2000/svg","path");
                     const inn = document.createElement("div");
                     if (e.disabled === "true") btn.className = "context-menu-button-disabled";
                     else btn.className = "context-menu-button";
@@ -61,8 +67,22 @@ const eval = (list) => {
                     rti.className = "context-menu-button-right-icon";
                     lbl.className = "context-menu-button-label";
                     lbl.innerHTML = e.label;
-                    shc.innerHTML = e.shortcut?.win
+                    shc.innerHTML = e.shortcut?.win;
+                    // lfi_svg.setAttribute("viewBox", "0 0 27 27");
+                    // rti_svg.setAttribute("viewBox", "0 0 27 27");
+                    // lfi_svg.setAttribute("width", "22");
+                    // lfi_svg.setAttribute("height", "22");
+                    // rti_svg.setAttribute("width", "22");
+                    // rti_svg.setAttribute("height", "22");
+                    // lfi_svg.classList.add("context-menu-button-symbol");
+                    // rti_svg.classList.add("context-menu-button-symbol");
+                    // lfi_svg_path.setAttribute("d", "M20.1514 7.87207L12.833 20.6787L6.99902 15.4424L8.00098 14.3262L12.4521 18.3203L18.8486 7.12793L20.1514 7.87207Z");
+                    // rti_svg_path.setAttribute("d", "M17.5605 13.5L11.0303 20.0303L9.96973 18.9697L15.4395 13.5L9.96973 8.03027L11.0303 6.96973L17.5605 13.5Z");
                     if (e.func && e.disabled !== "true") btn.addEventListener("click", () => { e.func(); closeCtxMenu(); });
+                    lfi_svg.appendChild(lfi_svg_path);
+                    rti_svg.appendChild(rti_svg_path);
+                    lfi.appendChild(lfi_svg);
+                    rti.appendChild(rti_svg);
                     inn.appendChild(lfi);
                     inn.appendChild(lbl);
                     inn.appendChild(rti);
@@ -96,7 +116,7 @@ const eval = (list) => {
                     if (e.shortcut) inn1.appendChild(shc1);
                     btn1.appendChild(inn1);
                     ctxMenuContainer.appendChild(btn1);
-                    //eval(e.list)
+                    //evaluate(e.list)
                     break;
             }
         });
@@ -109,7 +129,7 @@ const addContextMenuBar = (element, label, ctxList) => {
             ctxMenuContainer.firstChild.remove();
         }
 
-        eval(ctxList);
+        evaluate(ctxList);
 
         const rect = label.getBoundingClientRect();
         const rect1 = ctxMenuContainer.getBoundingClientRect();
@@ -141,7 +161,7 @@ const addContextMenu = (element, ctxList) => {
                 ctxMenuContainer.firstChild.remove();
             }
 
-            eval(ctxList);
+            evaluate(ctxList);
 
             ctxFrameEl.style.display = "block";
             ctxFrameEl.style.pointerEvents = null;

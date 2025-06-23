@@ -252,7 +252,6 @@ class widget {
     }
 }
 
-
 const dock1 = new dock(false);
 const dock2 = new dock(true);
 

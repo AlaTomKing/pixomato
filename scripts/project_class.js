@@ -1,3 +1,5 @@
+// This script is responsible for storing project informations
+
 // pixomato project!
 
 /* What an animation project should contain:

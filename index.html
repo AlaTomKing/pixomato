@@ -46,9 +46,67 @@
     <meta property="og:image:type" content="image/png">
     <meta property="og:image:alt" content="Use Pixomato now!">
 
+    <style>
+        #loading {
+            display: none;
+
+            /* display: flex; */
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex-direction: column;
+
+            background-color: var(--background-color);
+
+            transition: opacity 0.25s ease-in-out;
+        }
+
+        #loading > #loading-image {
+            width: 64px;
+            height: 64px;
+            aspect-ratio: 1 / 1;
+
+            background: url("./resources/logo_anim.png") 0px 0px;
+            animation-name: loading-animation;
+            animation-duration: 2s;
+            animation-iteration-count: infinite;
+            animation-timing-function: step-end;
+            background-size: cover;
+        }
+
+        #loading-text::after {
+            content: "";
+            animation-name: loading-animation-text;
+            animation-duration: 2s;
+            animation-iteration-count: infinite;
+            animation-timing-function: step-end;
+        }
+
+        @keyframes loading-animation {
+            0% {background: url("./resources/logo_anim.png") -192px 0px; background-size: cover;}
+            25% {background: url("./resources/logo_anim.png") 0px 0px; background-size: cover;}
+            50% {background: url("./resources/logo_anim.png") -64px 0px; background-size: cover;}
+            75% {background: url("./resources/logo_anim.png") -128px 0px; background-size: cover;}
+        }
+
+        @keyframes loading-animation-text {
+            0% {content: "..."}
+            25% {content: ""}
+            50% {content: "."}
+            75% {content: ".."}
+        }
+    </style>
+
     <noscript>
         <style>
             #pixomato {
+                display: none
+            }
+
+            #loading {
                 display: none
             }
 
@@ -66,6 +124,7 @@
             #no-js>#no-js-image {
                 width: 64px;
                 height: 64px;
+                aspect-ratio: 1 / 1;
 
                 background: url("./resources/logo_sad.png") 0px 0px;
                 background-size: cover;
@@ -91,11 +150,12 @@
             <br>
             Thank you for visiting though!
             <br><br>
-            <span style="color: #3765ad; font-weight: bold;">Please turn on JavaScript to use Pixomato.</span>
+            <span style="position: absolute; bottom: 20%; font-weight: bold; font-style: italic;">Please turn on JavaScript to use Pixomato.</span>
+            <span style="position: absolute; bottom: 5%; font-size: 12px;">© 2025 AlaTomKing</span>
         </span>
     </noscript>
 
-    <div id="pixomato" style="height: 100%; width: 100%;">
+    <div id="pixomato" style="display:none; height: 100%; width: 100%;">
         <div id="top-bar">
             <image class="bar-icon" src="./resources/logo_upscaled.png"></image>
             <!-- <text class="title">Pixomato</text> -->
@@ -115,6 +175,15 @@
 
         </div>
 
+        <!-- <div id="popup-frame">
+            <div id="blur-bg"></div>
+            <div id="home-screen">
+                <div id="title-frame">
+                    <div id="title-text">big popup for loading your existing animations and stuff</div>
+                </div>
+            </div>
+        </div> -->
+
         <div id="context-menu-frame" style="display:none" </div>
             <div id="context-menu" class="context-menu">
                 <div id="context-menu-container" class="context-menu-container"></div>
@@ -130,10 +199,11 @@
         </div>
     </div>
 
-    <!-- <div id="popup-frame">
-        <div id="blur-bg"></div>
-        <div id="home-screen"></div>
-    </div> -->
+    <span id="loading">
+        <div id="loading-image"></div>
+        <span id="loading-text" style="position: absolute; bottom: 20%; font-weight: bold; font-style: italic;">Pixomato is loading</span>
+        <span style="position: absolute; bottom: 5%; font-size: 12px;">© 2025 AlaTomKing</span>
+    </span>
 
     <script>
         const printWarning = (lang) => {
@@ -202,7 +272,10 @@
     <script src="scripts/mess/widgets.js"></script>
     <script src="scripts/mess/animation.js"></script>
     <script src="scripts/mess/menu_bar.js"></script>
-    <script src="scripts/mess/index.js"></script>
+    <!-- <script src="scripts/mess/index.js"></script> -->
+
+    <script src="scripts/index.js"></script>
+
     <!-- <script src="scripts/mess/compressor.js"></script>
     
     <!-- <div id="bottom-bar"></div> -->

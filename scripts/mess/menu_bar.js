@@ -27,6 +27,14 @@ const menuCtx = {
         },*/
         {
             type: "button",
+            label: "Open file...",
+            disabled: "true"
+        },
+        {
+            type: "separator",
+        },
+        {
+            type: "button",
             label: "Save",
             disabled: "true",
             shortcut: {
@@ -307,8 +315,11 @@ const menuCtx = {
             }
         },
         {
+            type: "separator"
+        },
+        {
             type: "button",
-            label: "Go to alatomking.github.io",
+            label: "Visit my main page",
             func: () => {
                 window.open("https://alatomking.github.io");
             }
