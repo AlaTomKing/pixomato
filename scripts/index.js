@@ -17,4 +17,4 @@
         // setTimeout(finish_loading, 500);
         finish_loading();
     });
-});
+})();
