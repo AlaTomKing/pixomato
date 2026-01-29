@@ -16,12 +16,13 @@ But I can tell you that the following browsers are accepted. However I don't kno
 - Safari (Yes I tested it and it obviously works)
 
 ### Not yet supported browsers
-Since Pixomato is made to be extremely versatile and to be supported on roughly all platforms, I decided to consider adding support to discontinued platforms as well via. web browsers.
+~~Since Pixomato is made to be extremely versatile and to be supported on roughly all platforms, I decided to consider adding support to discontinued platforms as well via. web browsers.
 - Nintendo 2/3DS
 - Nintendo Wii U
 - Xbox
 - PlayStation
-- Windows XP?
+- Windows XP?~~
+This is very unrealistic and probably impossible to do but I am trying my best to optimize this website as much as possible, so you can run it on a toothpick.
 
 But then I have to really optimize the web browser. I'm not really sure if some web browsers supports Flexbox.
 
