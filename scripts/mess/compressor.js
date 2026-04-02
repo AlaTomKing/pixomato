@@ -789,5 +789,5 @@ const export_img = (type, data, desc) => {
 
     // download("test10.png", encode_png());
 
-    saveFile(encode_png(data, desc), "pixomato_out", "image/png")
+    saveFile(encode_png(data, desc), "pixomato_out.png", "image/png")
 }

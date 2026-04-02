@@ -17,7 +17,7 @@ const bgRed = (text) => (`\x1b[41m${text}\x1b[0m`)
 const bgGreen = (text) => (`\x1b[42m${text}\x1b[0m`)
 const bgYellow = (text) => (`\x1b[43m${text}\x1b[0m`)
 const bgBlue = (text) => (`\x1b[44m${text}\x1b[0m`)
-const bgMagenta = (text) => (`\x1b[45m${text}\x1b[)0m`)
+const bgMagenta = (text) => (`\x1b[45m${text}\x1b[0m`)
 const bgCyan = (text) => (`\x1b[46m${text}\x1b[0m`)
 const bgWhite = (text) => (`\x1b[47m${text}\x1b[0m`)
 
