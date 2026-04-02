@@ -193,7 +193,7 @@ const render = () => {
 
   addImage(scaler, canvasPosX, canvasPosY, canvasWidth, canvasHeight);
 
-  for (const [key, color] of Object.entries(outsidePixels)) {
+  /*for (const [key, color] of Object.entries(outsidePixels)) {
     let [pixelX, pixelY] = key.split(":");
     pixelX = Number(pixelX);
     pixelY = Number(pixelY);
@@ -205,7 +205,7 @@ const render = () => {
       (canvasPosX + Math.floor((pixelX+1) * zoom * res) / res) - (canvasPosX + Math.floor(pixelX * zoom * res) / res),
       (canvasPosY + Math.floor((pixelY+1) * zoom * res) / res) - (canvasPosY + Math.floor(pixelY * zoom * res) / res)
     )
-  }
+  }*/
 
   if (mouseInFrame) {
     setRGBFill(0, 0, 0, 1);
@@ -294,9 +294,9 @@ const insertPixel = (currentPixelX, currentPixelY) => {
       pixels[position + 1] = g;
       pixels[position + 2] = b;
       pixels[position + 3] = 255;
-    } else {
+    } /*else {
       outsidePixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
-    }
+    }*/
   }
   //pixels[`${currentPixelX}:${currentPixelY}`] = currentColor;
 }
