@@ -4,7 +4,7 @@
 
 /* What an animation project should contain:
 
-file extension: .pxmt
+file extension: .pxmt/.pxmo (eg: "untitled.pxmo")
 
 */
 

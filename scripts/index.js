@@ -11,10 +11,16 @@
         loading_screen.style.display = "none";
 
         // setTimeout(() => {loading_screen.style.display = "none"}, 500)
+        start();
+    }
+
+    // the very first thing to do
+    const start = () => {
+        console.log("pixomato has started");
     }
 
     window.addEventListener("load", () => {
-        // setTimeout(finish_loading, 500);
+        //setTimeout(finish_loading, 500);
         finish_loading();
     });
 })();
