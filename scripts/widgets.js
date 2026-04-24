@@ -2,4 +2,9 @@
 
 (() => {
     const MAX_WIDGETS = 6; // maximum amount of widgets in a dock
+
+    // THE widget
+    class widget {
+
+    }
 })();

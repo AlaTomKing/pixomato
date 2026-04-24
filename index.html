@@ -1,7 +1,7 @@
 <!-- Pixomato -->
 <!-- by Tom -->
 
-<!-- Copyright (c) 2025 -->
+<!-- Copyright (c) 2026 -->
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,6 +16,8 @@
     <link rel="icon" type="image/png" href="./resources/favicon.png">
     <link rel="stylesheet" href="style.css">
     <meta name="theme-color" content="#3765ad">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inconsolata&amp;family=Noto+Sans:ital,wght@0,100..900;1,100..900&amp;family=Source+Sans+3:ital,wght@0,200..900;1,200..900&amp;display=swap" rel="stylesheet">
 
     <!-- ios bookmark app (when u wanna download on ipad) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -50,7 +52,7 @@
         #loading {
             display: none;
 
-            /* display: flex; */
+            /*display: flex;*/
             position: absolute;
             width: 100%;
             height: 100%;
@@ -143,13 +145,10 @@
     <noscript>
         <span id="no-js">
             <div id="no-js-image"></div>
-            <br>
-            Hi! I noticed you have JavaScript disabled!<br>
-            Unfortunately, Pixomato runs on JavaScript so you can't use<br>
-            the app without having JavaScript turned on.<br>
-            <br>
-            Thank you for visiting though!
-            <br><br>
+            <span style="width: 60%; margin-top: 2em">Hi! I noticed you have JavaScript disabled!
+            Unfortunately, Pixomato runs on JavaScript so you can't use
+            the app without having JavaScript turned on.</span>
+            <span style="margin-top: 1em">Thank you for visiting though!</span>
             <span style="position: absolute; bottom: 20%; font-weight: bold; font-style: italic;">Please turn on JavaScript to use Pixomato.</span>
             <span style="position: absolute; bottom: 5%; font-size: 12px;">© 2025 AlaTomKing</span>
         </span>
@@ -184,7 +183,7 @@
             </div>
         </div> -->
 
-        <div id="context-menu-frame" style="display:none"></div>
+        <div id="context-menu-frame" style="display:none">
             <div id="context-menu" class="context-menu">
                 <div id="context-menu-container" class="context-menu-container"></div>
                 <!-- <div class="context-menu-button">Button 1</div>
@@ -267,13 +266,15 @@
 
     <script src="bundle.js"></script>
 
-    <script src="scripts/mess/compressor.js"></script>
+    <!--<script src="scripts/mess/compressor.js"></script>
     <script src="scripts/mess/ctx_menu.js"></script>
     <script src="scripts/mess/widgets.js"></script>
     <script src="scripts/mess/animation.js"></script>
     <script src="scripts/mess/menu_bar.js"></script>
-    <script src="scripts/mess/index.js"></script>
+    <script src="scripts/mess/index.js"></script>-->
 
+    <script src="scripts/mess/ctx_menu.js"></script>
+    <script src="scripts/mess/menu_bar.js"></script>
     <script src="scripts/index.js"></script>
 
     <!-- <script src="scripts/mess/compressor.js"></script>-->
