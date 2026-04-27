@@ -1,5 +1,7 @@
 // TomatoTools UI Library Module
 
+
+
 class ComponentHandler {
     constructor(parent, window) {
 
@@ -15,3 +17,5 @@ class Window extends ComponentHandler {
 
     show() {}
 }
+
+console.log("tomato tools worky?")
