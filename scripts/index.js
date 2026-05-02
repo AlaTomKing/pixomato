@@ -16,6 +16,7 @@
 
     // the very first thing to do
     const start = () => {
+        // create a flying window thingy
         console.log("pixomato has started");
     }
 
