@@ -1,6 +1,7 @@
 // the main script
 
-(() => {
+import { Window } from "tomatotools_ui/index"
+
     const finish_loading = () => {
         const loading_screen = document.getElementById("loading");
         const pixomato_app = document.getElementById("pixomato");
@@ -24,4 +25,3 @@
         //setTimeout(finish_loading, 500);
         finish_loading();
     });
-})();
