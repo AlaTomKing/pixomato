@@ -12,10 +12,12 @@ class Window extends ComponentHandler {
     static targetWindow;
 
     constructor() {
-        
+
     }
 
-    show() {}
+    show() { }
 }
 
 console.log("tomato tools worky?")
+
+export { ComponentHandler, Window };
