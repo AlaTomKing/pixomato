@@ -30,7 +30,7 @@ class Window extends ComponentHandler {
 
         element.innerHTML = `
                 <div class="tt-titleBar">
-                    <label class="tt-titleName">Gaussian Blur</label>
+                    <label class="tt-titleName">${this.title}</label>
                     <button class="tt-closeButton">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
