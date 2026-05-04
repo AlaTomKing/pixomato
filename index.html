@@ -14,7 +14,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <link rel="icon" type="image/png" href="./resources/favicon.png">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <meta name="theme-color" content="#3765ad">
 
     <link href="https://fonts.googleapis.com/css2?family=Inconsolata&amp;family=Noto+Sans:ital,wght@0,100..900;1,100..900&amp;family=Source+Sans+3:ital,wght@0,200..900;1,200..900&amp;display=swap" rel="stylesheet">
@@ -102,7 +102,9 @@
         }
     </style>
 
-    <script src="scripts/tomatotools_ui/index.js" type="module"></script>
+    <!-- import TomatoTools UI module -->
+    <script src="scripts/tomatotools_ui/index.js"></script>
+    <link rel="stylesheet" type="text/css" href="scripts/tomatotools_ui/style.css">
 
     <noscript>
         <style>
@@ -184,6 +186,8 @@
                 </div>
             </div>
         </div> -->
+
+        <div id="widgets-frame"></div>
 
         <div id="context-menu-frame" style="display:none">
             <div id="context-menu" class="context-menu">

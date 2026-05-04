@@ -369,7 +369,8 @@
  }
 
  #main-frame,
- #resize-frame {
+ #resize-frame,
+ #widgets-frame {
      position: absolute;
 
      top: 32px;
