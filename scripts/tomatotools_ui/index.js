@@ -1,17 +1,28 @@
-// TomatoTools UI Library Module
+// TomatoTools UI Library: Another UI library made by Tom
+
+// import stylesheet
+import sheet from './style.css' with { type: 'css' };
+document.adoptedStyleSheets = [sheet];
+
+// import components
+import components from './components.js';
+
+console.log(components);
 
 let rootContainer;
 
-const WINDOW_BORDER_GAP = 16;
+const WINDOW_BORDER_GAP = 36;
 
 const setRootContainer = (container) => {
     rootContainer = container;
-}
+};
 
 class ComponentHandler {
     constructor(parent, window) {
 
     }
+
+
 }
 
 class Window extends ComponentHandler {
@@ -21,7 +32,9 @@ class Window extends ComponentHandler {
     static startMouseX;
     static startMouseY;
 
-    title = "New Window"
+    title = "New Window";
+
+    alignCenter = true;
 
     x;
     y;
@@ -32,6 +45,14 @@ class Window extends ComponentHandler {
         super();
 
         this.title = title;
+
+        if (this.alignCenter) {
+            window.addEventListener("resize", () => {
+                this.changePosition(Math.floor(rootContainer.offsetWidth / 2 - this.width / 2),
+
+                    Math.floor(rootContainer.offsetHeight / 2 - this.height / 2));
+            });
+        }
     }
 
     changePosition(x, y) {
@@ -66,7 +87,7 @@ class Window extends ComponentHandler {
                                 d="M5.75741 14.2426L10.0001 10M14.2427 5.75736L10.0001 10M14.2427 14.2426L10.0001 10M5.75741 5.75736L10.0001 10"
                                 stroke-width="1.5" stroke-linecap="round" />
                         </svg>
-                </button></div><div class="container"></div>`
+                </button></div><div class="container"></div>`;
 
         element.className = "tt-window";
 
@@ -85,13 +106,13 @@ class Window extends ComponentHandler {
                 Window.startMouseX = e.clientX;
                 Window.startMouseY = e.clientY;
             }
-        })
+        });
 
         document.addEventListener("mouseup", (e) => {
             if (Window.targetWindow && e.button === 0) {
                 Window.targetWindow = null;
             }
-        })
+        });
 
         rootContainer.appendChild(element);
 
@@ -106,8 +127,8 @@ document.addEventListener("mousemove", (e) => {
 
         Window.targetWindow.changePosition(Window.startPosX + e.clientX - Window.startMouseX,
             Window.startPosY + e.clientY - Window.startMouseY
-        )
+        );
     }
 });
 
-console.log("tomato tools worky?");
+export { setRootContainer, Window };
