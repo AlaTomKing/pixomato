@@ -1,5 +1,7 @@
 // the main script
 
+import { setRootContainer, Window } from "./tomatotools_ui/index.js";
+
 const finish_loading = () => {
     const loading_screen = document.getElementById("loading");
     const pixomato_app = document.getElementById("pixomato");
@@ -20,7 +22,7 @@ const start = () => {
     // create a flying window thingy
     console.log("pixomato has started");
 
-    const test = new Window("Welcome to Pixomato!");
+    const test = new Window("Welcome");
 
     test.show();
 }
