@@ -27,7 +27,7 @@ This is very unrealistic and probably impossible to do but I am trying my best t
 But then I have to really optimize the web browser. I'm not really sure if some web browsers supports Flexbox.
 
 ## Help
-Try really hard to break my website and when you manage to break my website, please report it in the [issues](https://github.com/AlaTomKing/pixomato/issues).
+Try really hard to break my website and when you manage to break my website, please report it in the [issues](https://codeberg.org/AlaTomKing/pixomato/issues).
 If you used a console to break my website and you think this bug has to be seriously addressed, please let me know!
 
 hi
