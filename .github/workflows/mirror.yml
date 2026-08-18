@@ -20,5 +20,5 @@ jobs:
         id: mirror
         uses: bridgelightcloud/github-mirror-action@v3
         with:
-          origin: ''
+          origin: 'https://codeberg.org/AlaTomKing/pixomato.git'
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
